@@ -1,6 +1,160 @@
-bin/
-obj/
-.vs/
-*.user
+## User-specific files
+*.rsuser
 *.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## User-specific files (MonoDevelop/Xamarin Studio)
+*.userprefs
+
+## Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## Visual Studio cache/options directory
+.vs/
+.vscode/
+.idea/
+
+## Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+## ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+## JetBrains Rider
+*.sln.iml
+
+## NuGet Packages
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+
+## NuGet Symbol Packages
+*.snupkg
+
+## Microsoft Azure Build Output
+csx/
+*.build.csdef
+
+## Microsoft Azure Emulator
+ecf/
+rcf/
+
+## Windows Store app package directories and files
+AppPackages/
+BundleArtifacts/
+Package.StoreAssociation.xml
+_pkginfo.txt
+*.appx
+*.appxbundle
+*.appxupload
+
+## Others
+*.cache
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+## Test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.trx
+*.coverage
+*.coveragexml
+
+## NCrunch
+_NCrunch_*
+.*crunch*.local.xml
+nCrunchTemp_*
+
+## Web workbench (sass)
+.sass-cache/
+
+## Installshield output folder
+[Ee]xpress/
+
+## DocProject is a documentation generator add-in
+DocProject/buildhelp/
+DocProject/Help/*.HxT
+DocProject/Help/*.HxC
+DocProject/Help/*.hhc
+DocProject/Help/*.hhk
+DocProject/Help/*.hhp
+DocProject/Help/Html2
+DocProject/Help/html
+
+## Publish Web Output
+*.[Pp]ublish.xml
+*.azurePubxml
+*.pubxml
+*.publishproj
+
+## Microsoft Azure Web App publish settings
+PublishScripts/
+
+## Database files
+*.mdf
+*.ldf
+*.ndf
+
+## SQL Server files
+*.mdf
+*.ldf
+
+## Business Intelligence projects
+*.rdl.data
+*.bim.layout
+*.bim_*.settings
+*.rptproj.rsuser
+*- [Bb]ackup.rdl
+*- [Bb]ackup ([0-9]).rdl
+*- [Bb]ackup ([0-9][0-9]).rdl
+
+## Node.js Tools for Visual Studio
+.ntvs_analysis.dat
+node_modules/
+
+## TypeScript cache
+*.tsbuildinfo
+
+## Rider
+.idea/
+*.sln.iml
+
+## Mac
+.DS_Store
+
+## Project-specific
 INSTRUCTIONS.md
+.claude/
+
+## SQLite databases (if using local dev)
+*.db
+*.db-shm
+*.db-wal
