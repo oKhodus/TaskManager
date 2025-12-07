@@ -1,0 +1,63 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Color Resources -->
+    <Style>
+        <Style.Resources>
+            <!-- Background Colors -->
+            <Color x:Key="PrimaryBg">#0E1A2B</Color>
+            <Color x:Key="SecondaryBg">#16263C</Color>
+            <Color x:Key="CardBg">#1D314A</Color>
+
+            <!-- Input Colors -->
+            <Color x:Key="InputBg">#0B1623</Color>
+            <Color x:Key="BorderDefault">#3C5068</Color>
+            <Color x:Key="BorderFocused">#4E7CBF</Color>
+
+            <!-- Text Colors -->
+            <Color x:Key="HeadingText">#FFFFFF</Color>
+            <Color x:Key="LabelText">#DCE6F2</Color>
+            <Color x:Key="InputText">#EAF3FF</Color>
+
+            <!-- Validation Colors -->
+            <Color x:Key="ValidationBorder">#FFCC00</Color>
+            <Color x:Key="ValidationText">#F2B700</Color>
+
+            <!-- Button Colors -->
+            <Color x:Key="PrimaryButtonBg">#2A4C7A</Color>
+            <Color x:Key="PrimaryButtonHover">#336399</Color>
+            <Color x:Key="SecondaryButtonBg">#233754</Color>
+            <Color x:Key="SecondaryButtonHover">#2F4A6D</Color>
+            <Color x:Key="ButtonText">#FFFFFF</Color>
+
+            <!-- Tab Colors -->
+            <Color x:Key="TabActive">#4E7CBF</Color>
+            <Color x:Key="TabInactive">#9AAFC5</Color>
+
+            <!-- Solid Color Brushes -->
+            <SolidColorBrush x:Key="PrimaryBgBrush" Color="{StaticResource PrimaryBg}"/>
+            <SolidColorBrush x:Key="SecondaryBgBrush" Color="{StaticResource SecondaryBg}"/>
+            <SolidColorBrush x:Key="CardBgBrush" Color="{StaticResource CardBg}"/>
+
+            <SolidColorBrush x:Key="InputBgBrush" Color="{StaticResource InputBg}"/>
+            <SolidColorBrush x:Key="BorderDefaultBrush" Color="{StaticResource BorderDefault}"/>
+            <SolidColorBrush x:Key="BorderFocusedBrush" Color="{StaticResource BorderFocused}"/>
+
+            <SolidColorBrush x:Key="HeadingTextBrush" Color="{StaticResource HeadingText}"/>
+            <SolidColorBrush x:Key="LabelTextBrush" Color="{StaticResource LabelText}"/>
+            <SolidColorBrush x:Key="InputTextBrush" Color="{StaticResource InputText}"/>
+
+            <SolidColorBrush x:Key="ValidationBorderBrush" Color="{StaticResource ValidationBorder}"/>
+            <SolidColorBrush x:Key="ValidationTextBrush" Color="{StaticResource ValidationText}"/>
+
+            <SolidColorBrush x:Key="PrimaryButtonBgBrush" Color="{StaticResource PrimaryButtonBg}"/>
+            <SolidColorBrush x:Key="PrimaryButtonHoverBrush" Color="{StaticResource PrimaryButtonHover}"/>
+            <SolidColorBrush x:Key="SecondaryButtonBgBrush" Color="{StaticResource SecondaryButtonBg}"/>
+            <SolidColorBrush x:Key="SecondaryButtonHoverBrush" Color="{StaticResource SecondaryButtonHover}"/>
+            <SolidColorBrush x:Key="ButtonTextBrush" Color="{StaticResource ButtonText}"/>
+
+            <SolidColorBrush x:Key="TabActiveBrush" Color="{StaticResource TabActive}"/>
+            <SolidColorBrush x:Key="TabInactiveBrush" Color="{StaticResource TabInactive}"/>
+        </Style.Resources>
+    </Style>
+</Styles>
