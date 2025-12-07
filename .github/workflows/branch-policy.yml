@@ -1,0 +1,26 @@
+name: Branch Policy
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  block-direct-main-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Block direct push to main
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          echo "❌ Direct push to main is forbidden."
+          exit 1
+
+      - name: Allow PR merges
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "✅ Pull Request detected. Merge allowed."
