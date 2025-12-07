@@ -1,11 +1,44 @@
+using App.Application.Interfaces.Repositories;
+using App.Application.Interfaces.Services;
+using App.Application.Services;
+using App.Infrastructure.Persistence;
+using App.Infrastructure.Repositories;
+using App.UI.ViewModels;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace App.UI;
 
 public static class DI
 {
-    public static void RegisterServices(IServiceCollection services)
+    public static void RegisterServices(IServiceCollection services, IConfiguration configuration)
     {
-        // empty for now
+        // Register DbContext
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlite(connectionString));
+
+        // Register generic repository
+        services.AddScoped(typeof(IRepository<>), typeof(RepositoryBase<>));
+
+        // Register specific repositories
+        services.AddScoped<IProjectRepository, ProjectRepository>();
+        services.AddScoped<ITaskRepository, TaskRepository>();
+        services.AddScoped<ISprintRepository, SprintRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ITagRepository, TagRepository>();
+
+        // Register business services
+        services.AddScoped<IProjectService, ProjectService>();
+        services.AddScoped<ITaskService, TaskService>();
+        services.AddScoped<IExportService, CsvExportService>();
+
+        // Register ViewModels
+        services.AddTransient<DashboardViewModel>();
+        services.AddTransient<ProjectMasterViewModel>();
+        services.AddTransient<ProjectDetailViewModel>();
+        services.AddTransient<TaskMasterViewModel>();
+        services.AddTransient<TaskDetailViewModel>();
     }
 }
