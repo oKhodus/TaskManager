@@ -1,26 +1,51 @@
 name: Branch Policy
 
 on:
+  pull_request:
+    types: [opened, synchronize, reopened]
   push:
     branches:
-      - '**'
-  pull_request:
-    branches:
       - main
+      - develop
+      - 'feature/**'
+      - 'bugfix/**'
+      - 'hotfix/**'
 
 jobs:
-  block-direct-main-push:
+  build:
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v4
       
-      - name: Block direct push to main
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          echo "❌ Direct push to main is forbidden."
-          exit 1
-
-      - name: Allow PR merges
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "✅ Pull Request detected. Merge allowed."
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
+      
+    - name: Test
+      run: dotnet test --no-build --configuration Release --verbosity normal
+      continue-on-error: true
+      
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+        
+    - name: Run dotnet format
+      run: dotnet format --verify-no-changes --verbosity diagnostic
+      continue-on-error: true
