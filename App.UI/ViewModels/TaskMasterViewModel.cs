@@ -132,6 +132,10 @@ public partial class TaskMasterViewModel : ViewModelBase
         {
             _taskDetailViewModel.LoadTask(value);
         }
+        else
+        {
+            _taskDetailViewModel.ClearTask();
+        }
     }
 
     partial void OnSearchTextChanged(string value)

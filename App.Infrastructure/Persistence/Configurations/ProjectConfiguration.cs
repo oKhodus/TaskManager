@@ -34,13 +34,13 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .WithOne(s => s.Project)
             .HasForeignKey(s => s.ProjectId)
             .OnDelete(DeleteBehavior.Restrict);
-            
+
         // Indexes
         builder.HasIndex(p => p.Key)
-            .IsUnique()
-            .HasFilter("[Key] IS NOT NULL");
+            .IsUnique();
             
         builder.HasIndex(p => p.Name);
     }
 }
+
 

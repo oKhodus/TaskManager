@@ -19,3 +19,4 @@ public class FeatureTaskConfiguration : IEntityTypeConfiguration<FeatureTask>
     }
 }
 
+

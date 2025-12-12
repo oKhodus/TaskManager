@@ -57,6 +57,10 @@ public partial class ProjectMasterViewModel : ViewModelBase
         {
             _projectDetailViewModel.LoadProject(value);
         }
+        else
+        {
+            _projectDetailViewModel.ClearProject();
+        }
     }
 
     [RelayCommand]

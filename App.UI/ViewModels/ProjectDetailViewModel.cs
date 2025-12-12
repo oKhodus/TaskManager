@@ -16,17 +16,17 @@ public partial class ProjectDetailViewModel : ViewModelBase
     private Guid _id;
 
     [ObservableProperty]
-    [Required(ErrorMessage = "Project name is required")]
-    [MinLength(3, ErrorMessage = "Project name must be at least 3 characters")]
     private string _name = string.Empty;
 
     [ObservableProperty]
     private string? _description;
 
     [ObservableProperty]
-    [Required(ErrorMessage = "Project key is required")]
     [MaxLength(10, ErrorMessage = "Project key must not exceed 10 characters")]
     private string _key = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasProjectLoaded;
 
     [ObservableProperty]
     private bool _isActive = true;
@@ -55,6 +55,20 @@ public partial class ProjectDetailViewModel : ViewModelBase
         CreatedAt = project.CreatedAt;
         UpdatedAt = project.UpdatedAt;
         IsEditMode = false;
+        HasProjectLoaded = true;
+    }
+
+    public void ClearProject()
+    {
+        Id = Guid.Empty;
+        Name = string.Empty;
+        Description = null;
+        Key = string.Empty;
+        IsActive = true;
+        CreatedAt = DateTime.MinValue;
+        UpdatedAt = null;
+        IsEditMode = false;
+        HasProjectLoaded = false;
     }
 
     [RelayCommand]

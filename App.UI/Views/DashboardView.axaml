@@ -69,10 +69,16 @@
                                        Foreground="{StaticResource HeadingTextBrush}" Margin="0,0,0,15"/>
 
                             <TextBlock Text="Name:" Foreground="{StaticResource LabelTextBrush}" Margin="0,0,0,5"/>
-                            <TextBox Text="{Binding Name}" IsReadOnly="{Binding !IsEditMode}" Margin="0,0,0,14"/>
+                            <TextBox Text="{Binding Name}" 
+                                     IsReadOnly="{Binding !IsEditMode}" 
+                                     Watermark="Press &quot;Load projects&quot; button &amp; choose your project"
+                                     Margin="0,0,0,14"/>
 
                             <TextBlock Text="Key:" Foreground="{StaticResource LabelTextBrush}" Margin="0,0,0,5"/>
-                            <TextBox Text="{Binding Key}" IsReadOnly="{Binding !IsEditMode}" Margin="0,0,0,14"/>
+                            <TextBox Text="{Binding Key}" 
+                                     IsReadOnly="{Binding !IsEditMode}" 
+                                     Watermark="Press &quot;Load projects&quot; button &amp; choose your project"
+                                     Margin="0,0,0,14"/>
 
                             <TextBlock Text="Description:" Foreground="{StaticResource LabelTextBrush}" Margin="0,0,0,5"/>
                             <TextBox Text="{Binding Description}" IsReadOnly="{Binding !IsEditMode}"
@@ -184,7 +190,10 @@
                                        Foreground="{StaticResource TabActiveBrush}" Margin="0,0,0,14"/>
 
                             <TextBlock Text="Title:" Foreground="{StaticResource LabelTextBrush}" Margin="0,0,0,5"/>
-                            <TextBox Text="{Binding Title}" IsReadOnly="{Binding !IsEditMode}" Margin="0,0,0,14"/>
+                            <TextBox Text="{Binding Title}" 
+                                     IsReadOnly="{Binding !IsEditMode}" 
+                                     Watermark="Press &quot;Load tasks&quot; button &amp; choose task"
+                                     Margin="0,0,0,14"/>
 
                             <TextBlock Text="Description:" Foreground="{StaticResource LabelTextBrush}" Margin="0,0,0,5"/>
                             <TextBox Text="{Binding Description}" IsReadOnly="{Binding !IsEditMode}"
@@ -196,8 +205,17 @@
                             <TextBlock Text="Priority:" Foreground="{StaticResource LabelTextBrush}" Margin="0,0,0,5"/>
                             <TextBlock Text="{Binding Priority}" Foreground="{StaticResource InputTextBrush}" Margin="0,0,0,14"/>
 
-                            <TextBlock Text="Project:" Foreground="{StaticResource LabelTextBrush}" Margin="0,0,0,5"/>
-                            <TextBlock Text="{Binding ProjectName}" Foreground="{StaticResource InputTextBrush}" Margin="0,0,0,14"/>
+                            <TextBlock Text="Project Name:" Foreground="{StaticResource LabelTextBrush}" Margin="0,0,0,5"/>
+                            <TextBox Text="{Binding ProjectName}" 
+                                     IsReadOnly="True" 
+                                     Watermark="Press &quot;Load tasks&quot; button &amp; choose task"
+                                     Margin="0,0,0,14"/>
+
+                            <TextBlock Text="Project Key:" Foreground="{StaticResource LabelTextBrush}" Margin="0,0,0,5"/>
+                            <TextBox Text="{Binding ProjectKey}" 
+                                     IsReadOnly="True" 
+                                     Watermark="Press &quot;Load tasks&quot; button &amp; choose task"
+                                     Margin="0,0,0,14"/>
 
                             <TextBlock Text="Assigned To:" Foreground="{StaticResource LabelTextBrush}" Margin="0,0,0,5"/>
                             <TextBlock Text="{Binding AssignedToName}" Foreground="{StaticResource InputTextBrush}" Margin="0,0,0,14"/>

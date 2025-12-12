@@ -18,8 +18,6 @@ public partial class TaskDetailViewModel : ViewModelBase
     private Guid _id;
 
     [ObservableProperty]
-    [Required(ErrorMessage = "Title is required")]
-    [MinLength(3, ErrorMessage = "Title must be at least 3 characters")]
     private string _title = string.Empty;
 
     [ObservableProperty]
@@ -54,6 +52,12 @@ public partial class TaskDetailViewModel : ViewModelBase
 
     [ObservableProperty]
     private string? _projectName;
+
+    [ObservableProperty]
+    private string? _projectKey;
+
+    [ObservableProperty]
+    private bool _hasTaskLoaded;
 
     [ObservableProperty]
     private bool _isEditMode;
@@ -107,7 +111,9 @@ public partial class TaskDetailViewModel : ViewModelBase
         AssignedToId = task.AssignedToId;
         AssignedToName = task.AssignedTo?.Username;
         ProjectName = task.Project?.Name;
+        ProjectKey = task.Project?.Key;
         IsEditMode = false;
+        HasTaskLoaded = true;
 
         // Determine task type and load specific fields
         if (task is BugTask bugTask)
@@ -130,6 +136,39 @@ public partial class TaskDetailViewModel : ViewModelBase
         {
             TaskType = "Task";
         }
+    }
+
+    public void ClearTask()
+    {
+        Id = Guid.Empty;
+        Title = string.Empty;
+        Description = string.Empty;
+        Status = TaskStatus.ToDo;
+        Priority = TaskPriority.Medium;
+        CreatedAt = DateTime.MinValue;
+        UpdatedAt = null;
+        DueDate = null;
+        ProjectId = Guid.Empty;
+        SprintId = null;
+        AssignedToId = null;
+        AssignedToName = null;
+        ProjectName = null;
+        ProjectKey = null;
+        IsEditMode = false;
+        HasTaskLoaded = false;
+        TaskType = string.Empty;
+
+        // Clear Bug-specific fields
+        StepsToReproduce = null;
+        ExpectedBehavior = null;
+        ActualBehavior = null;
+        Environment = null;
+        Severity = null;
+
+        // Clear Feature-specific fields
+        AcceptanceCriteria = null;
+        StoryPoints = null;
+        Epic = null;
     }
 
     [RelayCommand]
