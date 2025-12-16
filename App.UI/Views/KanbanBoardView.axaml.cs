@@ -31,12 +31,12 @@ public partial class KanbanBoardView : UserControl
         DataContextChanged += OnDataContextChanged;
     }
 
-    private void OnDataContextChanged(object? sender, EventArgs e)
+    private async void OnDataContextChanged(object? sender, EventArgs e)
     {
         if (DataContext is KanbanBoardViewModel viewModel)
         {
             // Load projects when view is ready
-            _ = viewModel.LoadProjectsCommand.ExecuteAsync(null);
+            await viewModel.LoadProjectsCommand.ExecuteAsync(null);
         }
     }
 
@@ -74,14 +74,18 @@ public partial class KanbanBoardView : UserControl
             var dragData = new DataObject();
             dragData.Set("KanbanCard", card);
 
+            #pragma warning disable CS0618 // Type or member is obsolete
             await DragDrop.DoDragDrop(e, dragData, DragDropEffects.Move);
+            #pragma warning restore CS0618 // Type or member is obsolete
         }
     }
 
     private void DragOver(object? sender, DragEventArgs e)
     {
         // Only allow drop if we're dragging a card
+        #pragma warning disable CS0618 // Type or member is obsolete
         if (e.Data.Contains("KanbanCard"))
+        #pragma warning restore CS0618 // Type or member is obsolete
         {
             e.DragEffects = DragDropEffects.Move;
         }
@@ -93,7 +97,9 @@ public partial class KanbanBoardView : UserControl
 
     private async void Drop(object? sender, DragEventArgs e)
     {
+        #pragma warning disable CS0618 // Type or member is obsolete
         if (!e.Data.Contains("KanbanCard") || _draggedCard == null)
+        #pragma warning restore CS0618 // Type or member is obsolete
         {
             return;
         }

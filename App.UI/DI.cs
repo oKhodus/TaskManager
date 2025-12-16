@@ -53,5 +53,6 @@ public static class DI
         services.AddTransient<TaskDetailViewModel>();
         services.AddTransient<CreateUserViewModel>();
         services.AddTransient<KanbanBoardViewModel>();
+        services.AddTransient<CreateTaskViewModel>();
     }
 }
