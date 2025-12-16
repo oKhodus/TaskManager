@@ -71,10 +71,10 @@ public partial class KanbanBoardView : UserControl
             _draggedCard = card;
             _draggedFromStatus = card.Status;
 
+            #pragma warning disable CS0618 // Type or member is obsolete
             var dragData = new DataObject();
             dragData.Set("KanbanCard", card);
 
-            #pragma warning disable CS0618 // Type or member is obsolete
             await DragDrop.DoDragDrop(e, dragData, DragDropEffects.Move);
             #pragma warning restore CS0618 // Type or member is obsolete
         }

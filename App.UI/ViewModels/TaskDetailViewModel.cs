@@ -154,7 +154,7 @@ public partial class TaskDetailViewModel : ViewModelBase
         {
             task = new BugTask
             {
-                StepsToReproduce = StepsToReproduce,
+                StepsToReproduce = StepsToReproduce ?? string.Empty,
                 ExpectedBehavior = ExpectedBehavior,
                 ActualBehavior = ActualBehavior,
                 Environment = Environment,
@@ -165,7 +165,7 @@ public partial class TaskDetailViewModel : ViewModelBase
         {
             task = new FeatureTask
             {
-                AcceptanceCriteria = AcceptanceCriteria,
+                AcceptanceCriteria = AcceptanceCriteria ?? string.Empty,
                 StoryPoints = StoryPoints,
                 Epic = Epic
             };

@@ -5,9 +5,13 @@ namespace App.UI.Views;
 
 public partial class CreateTaskWindow : Window
 {
-    public CreateTaskWindow(CreateTaskViewModel viewModel)
+    public CreateTaskWindow()
     {
         InitializeComponent();
+    }
+
+    public CreateTaskWindow(CreateTaskViewModel viewModel) : this()
+    {
         DataContext = viewModel;
 
         // Load data when window opens

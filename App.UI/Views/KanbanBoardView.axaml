@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:App.UI.ViewModels"
+             xmlns:entities="using:App.Domain.Entities"
              x:Class="App.UI.Views.KanbanBoardView"
              x:DataType="vm:KanbanBoardViewModel"
              Background="{StaticResource PrimaryBgBrush}">
@@ -28,7 +29,7 @@
                           HorizontalAlignment="Stretch"
                           MinWidth="250">
                     <ComboBox.ItemTemplate>
-                        <DataTemplate>
+                        <DataTemplate x:DataType="entities:Project">
                             <TextBlock Text="{Binding Name}"/>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
