@@ -13,7 +13,7 @@ public partial class DashboardViewModel : ViewModelBase
     private ProjectMasterViewModel? _projectMasterViewModel;
 
     [ObservableProperty]
-    private TaskMasterViewModel? _taskMasterViewModel;
+    private KanbanBoardViewModel? _kanbanBoardViewModel;
 
     [ObservableProperty]
     private int _selectedTabIndex;
@@ -26,11 +26,11 @@ public partial class DashboardViewModel : ViewModelBase
     public DashboardViewModel(
         ICurrentUserService currentUserService,
         ProjectMasterViewModel projectMasterViewModel,
-        TaskMasterViewModel taskMasterViewModel)
+        KanbanBoardViewModel kanbanBoardViewModel)
     {
         _currentUserService = currentUserService;
         _projectMasterViewModel = projectMasterViewModel;
-        _taskMasterViewModel = taskMasterViewModel;
+        _kanbanBoardViewModel = kanbanBoardViewModel;
         _selectedTabIndex = 0;
     }
 

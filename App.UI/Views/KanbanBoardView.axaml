@@ -1,0 +1,173 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:App.UI.ViewModels"
+             x:Class="App.UI.Views.KanbanBoardView"
+             x:DataType="vm:KanbanBoardViewModel"
+             Background="{StaticResource PrimaryBgBrush}">
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Header with Project Filter and Create Task Button -->
+        <Border Grid.Row="0"
+                Background="{StaticResource SecondaryBgBrush}"
+                CornerRadius="12"
+                Padding="20"
+                Margin="10,10,10,10"
+                BorderBrush="{StaticResource BorderDefaultBrush}"
+                BorderThickness="1">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="15">
+                <TextBlock Grid.Column="0"
+                           Text="Project:"
+                           Foreground="{StaticResource LabelTextBrush}"
+                           VerticalAlignment="Center"
+                           FontSize="14"/>
+
+                <ComboBox Grid.Column="1"
+                          ItemsSource="{Binding AvailableProjects}"
+                          SelectedItem="{Binding SelectedProject}"
+                          PlaceholderText="Select a project..."
+                          HorizontalAlignment="Stretch"
+                          MinWidth="250">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <Button Grid.Column="2"
+                        Content="Refresh"
+                        Command="{Binding LoadBoardCommand}"
+                        Classes="secondary"
+                        Padding="16,6"/>
+
+                <Button Grid.Column="3"
+                        Content="+ Create Task"
+                        Command="{Binding OpenCreateTaskDialogCommand}"
+                        Padding="16,6"/>
+            </Grid>
+        </Border>
+
+        <!-- Kanban Board Columns -->
+        <ScrollViewer Grid.Row="1"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Disabled"
+                      Padding="10,0">
+            <ItemsControl ItemsSource="{Binding Columns}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="15"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <!-- Single Kanban Column -->
+                        <Border Background="{StaticResource SecondaryBgBrush}"
+                                CornerRadius="12"
+                                Padding="15"
+                                MinWidth="300"
+                                MaxWidth="350"
+                                BorderBrush="{StaticResource BorderDefaultBrush}"
+                                BorderThickness="1">
+                            <Grid RowDefinitions="Auto,*">
+                                <!-- Column Header -->
+                                <TextBlock Grid.Row="0"
+                                           Text="{Binding Header}"
+                                           FontSize="16"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource HeadingTextBrush}"
+                                           Margin="0,0,0,15"/>
+
+                                <!-- Cards List with Drag-Drop -->
+                                <ScrollViewer Grid.Row="1"
+                                              VerticalScrollBarVisibility="Auto"
+                                              MaxHeight="600">
+                                    <ItemsControl ItemsSource="{Binding Cards}"
+                                                  x:Name="CardsItemsControl">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <!-- Task Card -->
+                                                <Border Background="{StaticResource CardBgBrush}"
+                                                        CornerRadius="8"
+                                                        Padding="12"
+                                                        Margin="0,0,0,10"
+                                                        BorderThickness="2,0,0,0"
+                                                        BorderBrush="{Binding PriorityColor}"
+                                                        Cursor="Hand"
+                                                        x:Name="CardBorder"
+                                                        DragDrop.AllowDrop="True">
+                                                    <StackPanel Spacing="8">
+                                                        <!-- Title -->
+                                                        <TextBlock Text="{Binding Title}"
+                                                                   FontWeight="SemiBold"
+                                                                   FontSize="14"
+                                                                   Foreground="{StaticResource InputTextBrush}"
+                                                                   TextWrapping="Wrap"/>
+
+                                                        <!-- Description (if exists) -->
+                                                        <TextBlock Text="{Binding Description}"
+                                                                   FontSize="12"
+                                                                   Foreground="{StaticResource LabelTextBrush}"
+                                                                   TextWrapping="Wrap"
+                                                                   MaxHeight="60"
+                                                                   IsVisible="{Binding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+                                                        <!-- Priority Badge -->
+                                                        <Border Background="{Binding PriorityColor}"
+                                                                CornerRadius="4"
+                                                                Padding="6,2"
+                                                                HorizontalAlignment="Left">
+                                                            <TextBlock Text="{Binding PriorityText}"
+                                                                       FontSize="11"
+                                                                       Foreground="#FFFFFF"
+                                                                       FontWeight="SemiBold"/>
+                                                        </Border>
+
+                                                        <!-- Assigned To -->
+                                                        <StackPanel Orientation="Horizontal" Spacing="5">
+                                                            <TextBlock Text="👤"
+                                                                       FontSize="12"/>
+                                                            <TextBlock Text="{Binding AssignedToName}"
+                                                                       FontSize="12"
+                                                                       Foreground="{StaticResource LabelTextBrush}"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Loading Indicator -->
+        <Border Grid.Row="1"
+                Background="#80000000"
+                IsVisible="{Binding IsLoading}">
+            <TextBlock Text="Loading..."
+                       FontSize="18"
+                       Foreground="{StaticResource HeadingTextBrush}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+        </Border>
+
+        <!-- Error Message -->
+        <Border Grid.Row="1"
+                Background="#3f1515"
+                BorderBrush="#f87171"
+                BorderThickness="1"
+                CornerRadius="12"
+                Padding="20"
+                Margin="50"
+                VerticalAlignment="Top"
+                IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <TextBlock Text="{Binding ErrorMessage}"
+                       Foreground="#f87171"
+                       TextWrapping="Wrap"/>
+        </Border>
+    </Grid>
+</UserControl>

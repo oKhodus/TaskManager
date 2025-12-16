@@ -33,6 +33,7 @@ public static class DI
         services.AddScoped<IProjectService, ProjectService>();
         services.AddScoped<ITaskService, TaskService>();
         services.AddScoped<IExportService, CsvExportService>();
+        services.AddScoped<IKanbanService, KanbanService>();
 
         // Register authentication services
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
@@ -51,5 +52,6 @@ public static class DI
         services.AddTransient<TaskMasterViewModel>();
         services.AddTransient<TaskDetailViewModel>();
         services.AddTransient<CreateUserViewModel>();
+        services.AddTransient<KanbanBoardViewModel>();
     }
 }
