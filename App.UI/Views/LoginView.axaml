@@ -1,0 +1,87 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:App.UI.ViewModels"
+             x:Class="App.UI.Views.LoginView"
+             x:DataType="vm:LoginViewModel"
+             Background="{StaticResource PrimaryBgBrush}">
+
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Border Background="{StaticResource SecondaryBgBrush}"
+                CornerRadius="12"
+                Padding="40"
+                Width="400"
+                BorderBrush="{StaticResource BorderDefaultBrush}"
+                BorderThickness="1">
+            <StackPanel Spacing="20">
+                <!-- Logo/Title -->
+                <TextBlock Text="TaskManager"
+                           FontSize="28"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource HeadingTextBrush}"
+                           HorizontalAlignment="Center"/>
+
+                <TextBlock Text="Please sign in to continue"
+                           FontSize="14"
+                           Foreground="{StaticResource LabelTextBrush}"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,10"/>
+
+                <!-- Username -->
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Username"
+                               Foreground="{StaticResource LabelTextBrush}"/>
+                    <TextBox Text="{Binding Username}"
+                             Watermark="Enter your username"
+                             IsEnabled="{Binding !IsLoading}"/>
+                </StackPanel>
+
+                <!-- Password -->
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Password"
+                               Foreground="{StaticResource LabelTextBrush}"/>
+                    <TextBox Text="{Binding Password}"
+                             Watermark="Enter your password"
+                             PasswordChar="●"
+                             IsEnabled="{Binding !IsLoading}"/>
+                </StackPanel>
+
+                <!-- Error Message -->
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Foreground="#f87171"
+                           FontSize="12"
+                           TextWrapping="Wrap"
+                           IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+
+                <!-- Login Button -->
+                <Button Content="Sign In"
+                        Command="{Binding LoginCommand}"
+                        IsEnabled="{Binding !IsLoading}"
+                        HorizontalAlignment="Stretch"
+                        Margin="0,10,0,0"/>
+
+                <!-- Loading Indicator -->
+                <TextBlock Text="Signing in..."
+                           Foreground="{StaticResource TabActiveBrush}"
+                           FontSize="12"
+                           HorizontalAlignment="Center"
+                           IsVisible="{Binding IsLoading}"/>
+
+                <!-- Info -->
+                <StackPanel Spacing="4" Margin="0,20,0,0">
+                    <TextBlock Text="Demo credentials:"
+                               FontSize="11"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Admin: admin / admin123"
+                               FontSize="11"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Worker: john.doe / password123"
+                               FontSize="11"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

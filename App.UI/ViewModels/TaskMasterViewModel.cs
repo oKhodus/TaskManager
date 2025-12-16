@@ -40,12 +40,11 @@ public partial class TaskMasterViewModel : ViewModelBase
     public ObservableCollection<TaskStatus?> AvailableStatuses { get; } = new()
     {
         null,
-        TaskStatus.ToDo,
+        TaskStatus.Todo,
+        TaskStatus.Assigned,
         TaskStatus.InProgress,
-        TaskStatus.InReview,
-        TaskStatus.Done,
-        TaskStatus.Blocked,
-        TaskStatus.Cancelled
+        TaskStatus.Review,
+        TaskStatus.Done
     };
 
     public ObservableCollection<TaskPriority?> AvailablePriorities { get; } = new()
@@ -159,9 +158,25 @@ public partial class TaskMasterViewModel : ViewModelBase
         if (Tasks.Count == 0)
             return;
 
-        var fileName = $"Tasks_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
-        var filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName);
+        try
+        {
+            var fileName = $"Tasks_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+            var filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName);
 
-        await _exportService.ExportToCsvAsync(Tasks, filePath);
+            await _exportService.ExportToCsvAsync(Tasks, filePath);
+
+            // TODO: Show success notification to user
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = Path.GetDirectoryName(filePath),
+                UseShellExecute = true,
+                Verb = "open"
+            });
+        }
+        catch (Exception ex)
+        {
+            // TODO: Show error notification to user
+            Console.WriteLine($"Export failed: {ex.Message}");
+        }
     }
 }

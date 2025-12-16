@@ -5,13 +5,55 @@
              x:DataType="vm:DashboardViewModel"
              Background="{StaticResource PrimaryBgBrush}">
 
-    <TabControl SelectedIndex="{Binding SelectedTabIndex}" Background="{StaticResource PrimaryBgBrush}">
-        <TabItem Header="Projects">
-            <Grid RowDefinitions="Auto,*" ColumnDefinitions="2*,3*" Margin="10" Background="{StaticResource PrimaryBgBrush}">
+    <Grid RowDefinitions="Auto,*" Background="{StaticResource PrimaryBgBrush}">
+        <!-- User Header with Logout -->
+        <Border Grid.Row="0"
+                Background="{StaticResource SecondaryBgBrush}"
+                BorderBrush="{StaticResource BorderDefaultBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="20,10">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="15" VerticalAlignment="Center">
+                    <TextBlock Text="TaskManager"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource HeadingTextBrush}"/>
+                    <TextBlock Text="|"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               VerticalAlignment="Center"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="User:"
+                                   Foreground="{StaticResource LabelTextBrush}"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding CurrentUsername}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource InputTextBrush}"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="•"
+                                   Foreground="{StaticResource LabelTextBrush}"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding CurrentUserRole}"
+                                   Foreground="{StaticResource TabActiveBrush}"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <Button Grid.Column="1"
+                        Content="Logout"
+                        Command="{Binding LogoutCommand}"
+                        Classes="secondary"
+                        Padding="16,6"/>
+            </Grid>
+        </Border>
+
+        <!-- Main Content -->
+        <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedTabIndex}" Background="{StaticResource PrimaryBgBrush}">
+            <TabItem Header="Projects">
+                <Grid RowDefinitions="Auto,*" ColumnDefinitions="2*,3*" Margin="10" Background="{StaticResource PrimaryBgBrush}">
                 <!-- Projects Master Sidebar -->
                 <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
                         Background="{StaticResource SecondaryBgBrush}"
-                        CornerRadius="6"
+                        CornerRadius="12"
                         Padding="20"
                         Margin="0,0,10,0">
                     <Grid RowDefinitions="Auto,Auto,*">
@@ -21,6 +63,11 @@
                         <StackPanel Grid.Row="1" Spacing="8" Margin="0,0,0,15">
                             <Button Content="Load Projects" Command="{Binding ProjectMasterViewModel.LoadProjectsCommand}"/>
                             <Button Content="Export to CSV" Command="{Binding ProjectMasterViewModel.ExportToCsvCommand}"/>
+
+                            <!-- Admin Only: Create User Button -->
+                            <Button Content="Create User"
+                                    Command="{Binding ProjectMasterViewModel.OpenCreateUserDialogCommand}"
+                                    IsVisible="{Binding ProjectMasterViewModel.IsAdmin}"/>
                         </StackPanel>
 
                         <ListBox Grid.Row="2"
@@ -33,7 +80,7 @@
                                     <Setter Property="Background" Value="{StaticResource CardBgBrush}"/>
                                     <Setter Property="Margin" Value="0,0,0,8"/>
                                     <Setter Property="Padding" Value="12"/>
-                                    <Setter Property="CornerRadius" Value="4"/>
+                                    <Setter Property="CornerRadius" Value="8"/>
                                     <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}"/>
                                     <Setter Property="BorderThickness" Value="1"/>
                                 </Style>
@@ -59,7 +106,7 @@
                 <!-- Project Detail Panel -->
                 <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1"
                         Background="{StaticResource CardBgBrush}"
-                        CornerRadius="6"
+                        CornerRadius="12"
                         Padding="20"
                         BorderBrush="{StaticResource BorderDefaultBrush}"
                         BorderThickness="1">
@@ -96,7 +143,7 @@
                 <!-- Tasks Filter/Search Bar -->
                 <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                         Background="{StaticResource SecondaryBgBrush}"
-                        CornerRadius="6"
+                        CornerRadius="12"
                         Padding="20"
                         Margin="0,0,0,10"
                         BorderBrush="{StaticResource BorderDefaultBrush}"
@@ -123,7 +170,7 @@
                 <!-- Tasks Master Sidebar -->
                 <Border Grid.Row="1" Grid.Column="0"
                         Background="{StaticResource SecondaryBgBrush}"
-                        CornerRadius="6"
+                        CornerRadius="12"
                         Padding="20"
                         Margin="0,0,10,0">
                     <Grid RowDefinitions="Auto,*">
@@ -142,7 +189,7 @@
                                     <Setter Property="Background" Value="{StaticResource CardBgBrush}"/>
                                     <Setter Property="Margin" Value="0,0,0,8"/>
                                     <Setter Property="Padding" Value="12"/>
-                                    <Setter Property="CornerRadius" Value="4"/>
+                                    <Setter Property="CornerRadius" Value="8"/>
                                     <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}"/>
                                     <Setter Property="BorderThickness" Value="1"/>
                                 </Style>
@@ -159,7 +206,7 @@
                                         <TextBlock Text="{Binding Title}" FontWeight="Bold" Foreground="{StaticResource InputTextBrush}"/>
                                         <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
                                             <TextBlock Text="{Binding Status}" FontSize="11" Foreground="{StaticResource TabActiveBrush}"/>
-                                            <TextBlock Text="{Binding Priority}" FontSize="11" Foreground="{StaticResource ValidationTextBrush}"/>
+                                            <TextBlock Text="{Binding Priority}" FontSize="11" Foreground="{StaticResource PriorityHighBrush}"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
@@ -171,7 +218,7 @@
                 <!-- Task Detail Panel -->
                 <Border Grid.Row="1" Grid.Column="1"
                         Background="{StaticResource CardBgBrush}"
-                        CornerRadius="6"
+                        CornerRadius="12"
                         Padding="20"
                         BorderBrush="{StaticResource BorderDefaultBrush}"
                         BorderThickness="1">
@@ -213,4 +260,5 @@
             </Grid>
         </TabItem>
     </TabControl>
+    </Grid>
 </UserControl>

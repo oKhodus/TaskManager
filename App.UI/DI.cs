@@ -34,11 +34,22 @@ public static class DI
         services.AddScoped<ITaskService, TaskService>();
         services.AddScoped<IExportService, CsvExportService>();
 
+        // Register authentication services
+        services.AddSingleton<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddSingleton<ICurrentUserService, CurrentUserService>();
+
+        // Register user management services
+        services.AddScoped<IUserManagementService, UserManagementService>();
+
         // Register ViewModels
+        services.AddSingleton<MainWindowViewModel>();
+        services.AddTransient<LoginViewModel>();
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<ProjectMasterViewModel>();
         services.AddTransient<ProjectDetailViewModel>();
         services.AddTransient<TaskMasterViewModel>();
         services.AddTransient<TaskDetailViewModel>();
+        services.AddTransient<CreateUserViewModel>();
     }
 }

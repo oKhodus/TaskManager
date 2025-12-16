@@ -5,10 +5,10 @@
     <Style Selector="Button">
         <Setter Property="Background" Value="{StaticResource PrimaryButtonBgBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource ButtonTextBrush}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="4"/>
-        <Setter Property="Padding" Value="12,6"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="16,8"/>
         <Setter Property="Cursor" Value="Hand"/>
     </Style>
 
@@ -23,6 +23,8 @@
     <!-- Secondary Button Style (using Classes) -->
     <Style Selector="Button.secondary">
         <Setter Property="Background" Value="{StaticResource SecondaryButtonBgBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
     </Style>
 
     <Style Selector="Button.secondary:pointerover /template/ ContentPresenter">

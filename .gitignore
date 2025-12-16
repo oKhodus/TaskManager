@@ -153,6 +153,7 @@ node_modules/
 ## Project-specific
 INSTRUCTIONS.md
 .claude/
+reference/
 
 ## SQLite databases (if using local dev)
 *.db

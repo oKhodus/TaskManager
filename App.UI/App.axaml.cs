@@ -48,10 +48,10 @@ public partial class App : AvaloniaApplication
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var dashboardViewModel = ServiceProvider.GetRequiredService<ViewModels.DashboardViewModel>();
+            var mainWindowViewModel = ServiceProvider.GetRequiredService<ViewModels.MainWindowViewModel>();
             desktop.MainWindow = new MainWindow
             {
-                DataContext = dashboardViewModel
+                DataContext = mainWindowViewModel
             };
         }
 

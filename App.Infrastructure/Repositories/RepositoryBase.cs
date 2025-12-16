@@ -39,6 +39,17 @@ public class RepositoryBase<T> : IRepository<T> where T : class
 
     public virtual async Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
     {
+        // Detach any existing tracked entity with the same key
+        var entry = _context.Entry(entity);
+        if (entry.State == EntityState.Detached)
+        {
+            var existingEntity = await _dbSet.FindAsync([entry.Property("Id").CurrentValue], cancellationToken);
+            if (existingEntity != null)
+            {
+                _context.Entry(existingEntity).State = EntityState.Detached;
+            }
+        }
+
         _dbSet.Update(entity);
         await _context.SaveChangesAsync(cancellationToken);
     }

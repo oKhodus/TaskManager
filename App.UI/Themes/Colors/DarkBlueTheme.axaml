@@ -1,38 +1,39 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- Color Resources -->
+    <!-- Color Resources - Based on Reference Project Theme -->
     <Style>
         <Style.Resources>
-            <!-- Background Colors -->
-            <Color x:Key="PrimaryBg">#0E1A2B</Color>
-            <Color x:Key="SecondaryBg">#16263C</Color>
-            <Color x:Key="CardBg">#1D314A</Color>
+            <!-- Background Colors (Dark Theme from Reference) -->
+            <Color x:Key="PrimaryBg">#0f1217</Color>
+            <Color x:Key="SecondaryBg">#151922</Color>
+            <Color x:Key="CardBg">#1a1f2b</Color>
 
             <!-- Input Colors -->
-            <Color x:Key="InputBg">#0B1623</Color>
-            <Color x:Key="BorderDefault">#3C5068</Color>
-            <Color x:Key="BorderFocused">#4E7CBF</Color>
+            <Color x:Key="InputBg">#1a1f2b</Color>
+            <Color x:Key="BorderDefault">#222833</Color>
+            <Color x:Key="BorderFocused">#6ea8ff</Color>
 
             <!-- Text Colors -->
-            <Color x:Key="HeadingText">#FFFFFF</Color>
-            <Color x:Key="LabelText">#DCE6F2</Color>
-            <Color x:Key="InputText">#EAF3FF</Color>
+            <Color x:Key="HeadingText">#f9fafb</Color>
+            <Color x:Key="LabelText">#9aa4b2</Color>
+            <Color x:Key="InputText">#e5e7eb</Color>
 
-            <!-- Validation Colors -->
-            <Color x:Key="ValidationBorder">#FFCC00</Color>
-            <Color x:Key="ValidationText">#F2B700</Color>
+            <!-- Priority Colors (from Reference) -->
+            <Color x:Key="PriorityUrgent">#f87171</Color>
+            <Color x:Key="PriorityHigh">#facc15</Color>
+            <Color x:Key="PriorityNormal">#4ade80</Color>
 
             <!-- Button Colors -->
-            <Color x:Key="PrimaryButtonBg">#2A4C7A</Color>
-            <Color x:Key="PrimaryButtonHover">#336399</Color>
-            <Color x:Key="SecondaryButtonBg">#233754</Color>
-            <Color x:Key="SecondaryButtonHover">#2F4A6D</Color>
+            <Color x:Key="PrimaryButtonBg">#6ea8ff</Color>
+            <Color x:Key="PrimaryButtonHover">#8bb9ff</Color>
+            <Color x:Key="SecondaryButtonBg">#151922</Color>
+            <Color x:Key="SecondaryButtonHover">#1a1f2b</Color>
             <Color x:Key="ButtonText">#FFFFFF</Color>
 
             <!-- Tab Colors -->
-            <Color x:Key="TabActive">#4E7CBF</Color>
-            <Color x:Key="TabInactive">#9AAFC5</Color>
+            <Color x:Key="TabActive">#6ea8ff</Color>
+            <Color x:Key="TabInactive">#9aa4b2</Color>
 
             <!-- Solid Color Brushes -->
             <SolidColorBrush x:Key="PrimaryBgBrush" Color="{StaticResource PrimaryBg}"/>
@@ -47,8 +48,9 @@
             <SolidColorBrush x:Key="LabelTextBrush" Color="{StaticResource LabelText}"/>
             <SolidColorBrush x:Key="InputTextBrush" Color="{StaticResource InputText}"/>
 
-            <SolidColorBrush x:Key="ValidationBorderBrush" Color="{StaticResource ValidationBorder}"/>
-            <SolidColorBrush x:Key="ValidationTextBrush" Color="{StaticResource ValidationText}"/>
+            <SolidColorBrush x:Key="PriorityUrgentBrush" Color="{StaticResource PriorityUrgent}"/>
+            <SolidColorBrush x:Key="PriorityHighBrush" Color="{StaticResource PriorityHigh}"/>
+            <SolidColorBrush x:Key="PriorityNormalBrush" Color="{StaticResource PriorityNormal}"/>
 
             <SolidColorBrush x:Key="PrimaryButtonBgBrush" Color="{StaticResource PrimaryButtonBg}"/>
             <SolidColorBrush x:Key="PrimaryButtonHoverBrush" Color="{StaticResource PrimaryButtonHover}"/>

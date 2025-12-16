@@ -2,11 +2,43 @@ using App.Domain.Entities;
 using App.Domain.Enums;
 using TaskStatus = App.Domain.Enums.TaskStatus;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace App.Infrastructure.Persistence;
 
 public static class DataSeeder
 {
+    /// <summary>
+    /// Hash password using same algorithm as PasswordHasher service
+    /// </summary>
+    private static string HashPassword(string password)
+    {
+        const int SaltSize = 16;
+        const int HashSize = 32;
+        const int Iterations = 100000;
+
+        byte[] salt = new byte[SaltSize];
+        using (var rng = RandomNumberGenerator.Create())
+        {
+            rng.GetBytes(salt);
+        }
+
+        byte[] hash = KeyDerivation.Pbkdf2(
+            password: password,
+            salt: salt,
+            prf: KeyDerivationPrf.HMACSHA256,
+            iterationCount: Iterations,
+            numBytesRequested: HashSize
+        );
+
+        byte[] hashBytes = new byte[SaltSize + HashSize];
+        Array.Copy(salt, 0, hashBytes, 0, SaltSize);
+        Array.Copy(hash, 0, hashBytes, SaltSize, HashSize);
+
+        return Convert.ToBase64String(hashBytes);
+    }
+
     public static void SeedData(ApplicationDbContext context)
     {
         // Ensure database is created
@@ -25,9 +57,11 @@ public static class DataSeeder
             {
                 Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
                 Username = "admin",
+                PasswordHash = HashPassword("admin123"), // password: admin123
                 Email = "admin@taskmanager.com",
                 FirstName = "Admin",
                 LastName = "User",
+                Role = UserRole.Admin,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow.AddDays(-30)
             },
@@ -35,9 +69,11 @@ public static class DataSeeder
             {
                 Id = Guid.Parse("00000000-0000-0000-0000-000000000002"),
                 Username = "john.doe",
+                PasswordHash = HashPassword("password123"), // password: password123
                 Email = "john.doe@taskmanager.com",
                 FirstName = "John",
                 LastName = "Doe",
+                Role = UserRole.Worker,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow.AddDays(-25)
             },
@@ -45,9 +81,11 @@ public static class DataSeeder
             {
                 Id = Guid.Parse("00000000-0000-0000-0000-000000000003"),
                 Username = "jane.smith",
+                PasswordHash = HashPassword("password123"), // password: password123
                 Email = "jane.smith@taskmanager.com",
                 FirstName = "Jane",
                 LastName = "Smith",
+                Role = UserRole.Worker,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow.AddDays(-20)
             }
@@ -175,7 +213,7 @@ public static class DataSeeder
                 Id = Guid.Parse("40000000-0000-0000-0000-000000000002"),
                 Title = "Mobile menu overlaps content",
                 Description = "On mobile devices, the navigation menu overlaps page content",
-                Status = TaskStatus.ToDo,
+                Status = TaskStatus.Todo,
                 Priority = TaskPriority.Medium,
                 ProjectId = projects[0].Id,
                 SprintId = sprints[1].Id,
@@ -202,7 +240,7 @@ public static class DataSeeder
                 Id = Guid.Parse("50000000-0000-0000-0000-000000000001"),
                 Title = "Implement dark mode",
                 Description = "Add dark mode theme toggle to the application",
-                Status = TaskStatus.InReview,
+                Status = TaskStatus.Review,
                 Priority = TaskPriority.Medium,
                 ProjectId = projects[0].Id,
                 SprintId = sprints[0].Id,
@@ -219,7 +257,7 @@ public static class DataSeeder
                 Id = Guid.Parse("50000000-0000-0000-0000-000000000002"),
                 Title = "Add task filtering",
                 Description = "Allow users to filter tasks by status, priority, and assignee",
-                Status = TaskStatus.ToDo,
+                Status = TaskStatus.Todo,
                 Priority = TaskPriority.Low,
                 ProjectId = projects[0].Id,
                 SprintId = sprints[1].Id,

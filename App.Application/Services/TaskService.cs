@@ -63,7 +63,7 @@ public class TaskService : ITaskService
         task.CreatedAt = DateTime.UtcNow;
         if (task.Status == default)
         {
-            task.Status = TaskStatus.ToDo;
+            task.Status = TaskStatus.Todo;
         }
         if (task.Priority == default)
         {

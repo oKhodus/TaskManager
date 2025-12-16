@@ -7,7 +7,7 @@ public abstract class TaskBase
     public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public Enums.TaskStatus Status { get; set; } = Enums.TaskStatus.ToDo;
+    public Enums.TaskStatus Status { get; set; } = Enums.TaskStatus.Todo;
     public TaskPriority Priority { get; set; } = TaskPriority.Medium;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }

@@ -8,7 +8,7 @@
         <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="8,6"/>
-        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="CornerRadius" Value="12"/>
     </Style>
 
     <Style Selector="TextBox:focus">
@@ -26,7 +26,7 @@
         <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="8,6"/>
-        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="CornerRadius" Value="12"/>
     </Style>
 
     <Style Selector="ComboBox:focus">

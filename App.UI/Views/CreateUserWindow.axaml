@@ -1,0 +1,143 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:App.UI.ViewModels"
+        x:Class="App.UI.Views.CreateUserWindow"
+        x:DataType="vm:CreateUserViewModel"
+        Title="Create User"
+        Width="500"
+        Height="650"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource PrimaryBgBrush}">
+
+    <Border Padding="30" Background="{StaticResource SecondaryBgBrush}" CornerRadius="12" Margin="10">
+        <ScrollViewer Padding="0,0,10,0">
+            <StackPanel Spacing="20">
+                <!-- Header -->
+                <TextBlock Text="Create New User"
+                           FontSize="24"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource HeadingTextBrush}"/>
+
+                <TextBlock Text="Only administrators can create new users"
+                           FontSize="12"
+                           Foreground="{StaticResource LabelTextBrush}"
+                           Margin="0,-15,0,0"/>
+
+                <!-- Username -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Username *"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               FontSize="13"/>
+                    <TextBox Text="{Binding Username}"
+                             Watermark="Enter username (min 3 characters)"
+                             IsEnabled="{Binding !IsLoading}"/>
+                </StackPanel>
+
+                <!-- Password -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Password *"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               FontSize="13"/>
+                    <TextBox Text="{Binding Password}"
+                             Watermark="Enter password (min 6 characters)"
+                             PasswordChar="●"
+                             IsEnabled="{Binding !IsLoading}"/>
+                </StackPanel>
+
+                <!-- Email -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Email *"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               FontSize="13"/>
+                    <TextBox Text="{Binding Email}"
+                             Watermark="user@example.com"
+                             IsEnabled="{Binding !IsLoading}"/>
+                </StackPanel>
+
+                <!-- First Name -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="First Name *"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               FontSize="13"/>
+                    <TextBox Text="{Binding FirstName}"
+                             Watermark="Enter first name"
+                             IsEnabled="{Binding !IsLoading}"/>
+                </StackPanel>
+
+                <!-- Last Name -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Last Name *"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               FontSize="13"/>
+                    <TextBox Text="{Binding LastName}"
+                             Watermark="Enter last name"
+                             IsEnabled="{Binding !IsLoading}"/>
+                </StackPanel>
+
+                <!-- Role -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Role *"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               FontSize="13"/>
+                    <ComboBox ItemsSource="{Binding AvailableRoles}"
+                              SelectedItem="{Binding SelectedRole}"
+                              IsEnabled="{Binding !IsLoading}"
+                              HorizontalAlignment="Stretch"/>
+                </StackPanel>
+
+                <!-- Active Status -->
+                <CheckBox Content="Active"
+                          IsChecked="{Binding IsActive}"
+                          IsEnabled="{Binding !IsLoading}"
+                          Foreground="{StaticResource LabelTextBrush}"/>
+
+                <!-- Error Message -->
+                <Border Background="#3f1515"
+                        BorderBrush="#f87171"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="12"
+                        IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <TextBlock Text="{Binding ErrorMessage}"
+                               Foreground="#f87171"
+                               TextWrapping="Wrap"
+                               FontSize="12"/>
+                </Border>
+
+                <!-- Success Message -->
+                <Border Background="#1a3f1a"
+                        BorderBrush="#4ade80"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="12"
+                        IsVisible="{Binding SuccessMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <TextBlock Text="{Binding SuccessMessage}"
+                               Foreground="#4ade80"
+                               TextWrapping="Wrap"
+                               FontSize="12"/>
+                </Border>
+
+                <!-- Buttons -->
+                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="0,10,0,0">
+                    <Button Content="Clear"
+                            Command="{Binding ClearFormCommand}"
+                            IsEnabled="{Binding !IsLoading}"
+                            Classes="secondary"
+                            Width="100"/>
+                    <Button Content="Create User"
+                            Command="{Binding CreateUserCommand}"
+                            IsEnabled="{Binding !IsLoading}"
+                            Width="120"/>
+                </StackPanel>
+
+                <!-- Loading Indicator -->
+                <TextBlock Text="Creating user..."
+                           Foreground="{StaticResource TabActiveBrush}"
+                           FontSize="12"
+                           HorizontalAlignment="Center"
+                           IsVisible="{Binding IsLoading}"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
+</Window>

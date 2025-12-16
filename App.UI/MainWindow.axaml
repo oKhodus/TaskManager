@@ -6,9 +6,19 @@
         xmlns:vm="using:App.UI.ViewModels"
         mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="700"
         x:Class="App.UI.MainWindow"
-        x:DataType="vm:DashboardViewModel"
+        x:DataType="vm:MainWindowViewModel"
         Title="TaskManager"
         Width="1200"
         Height="700">
-    <views:DashboardView/>
+
+    <ContentControl Content="{Binding CurrentView}">
+        <ContentControl.DataTemplates>
+            <DataTemplate DataType="vm:LoginViewModel">
+                <views:LoginView/>
+            </DataTemplate>
+            <DataTemplate DataType="vm:DashboardViewModel">
+                <views:DashboardView/>
+            </DataTemplate>
+        </ContentControl.DataTemplates>
+    </ContentControl>
 </Window>

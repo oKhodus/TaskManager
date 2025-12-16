@@ -240,13 +240,10 @@ Workflow includes:
 - `bugfix/` - Bug fixes
 - `hotfix/` - Critical production fixes
 
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
 ## 👥 Authors
 
-- **Your Name** - *Initial work*
+- **Kyrylo Pryiomyshev**
+- **Oleksii Khodus**
 
 ## 🙏 Acknowledgments
 
