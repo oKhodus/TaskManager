@@ -22,12 +22,14 @@
                            VerticalAlignment="Center"
                            FontSize="14"/>
 
+                <!-- Project Selector or No Projects Message -->
                 <ComboBox Grid.Column="1"
                           ItemsSource="{Binding AvailableProjects}"
                           SelectedItem="{Binding SelectedProject}"
                           PlaceholderText="Select a project..."
                           HorizontalAlignment="Stretch"
-                          MinWidth="250">
+                          MinWidth="250"
+                          IsVisible="{Binding !HasNoProjects}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate x:DataType="entities:Project">
                             <TextBlock Text="{Binding Name}"/>
@@ -35,15 +37,24 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
 
+                <!-- No Projects Message -->
+                <TextBlock Grid.Column="1"
+                           Text="{Binding NoProjectsMessage}"
+                           Foreground="#facc15"
+                           VerticalAlignment="Center"
+                           IsVisible="{Binding HasNoProjects}"/>
+
                 <Button Grid.Column="2"
                         Content="Refresh"
                         Command="{Binding LoadBoardCommand}"
                         Classes="secondary"
                         Padding="16,6"/>
 
+                <!-- Admin Only: Create Task Button -->
                 <Button Grid.Column="3"
                         Content="+ Create Task"
                         Command="{Binding OpenCreateTaskDialogCommand}"
+                        IsVisible="{Binding IsAdmin}"
                         Padding="16,6"/>
             </Grid>
         </Border>

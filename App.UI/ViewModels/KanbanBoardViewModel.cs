@@ -37,6 +37,11 @@ public partial class KanbanBoardViewModel : ViewModelBase
     [ObservableProperty]
     private string? _errorMessage;
 
+    /// <summary>
+    /// Check if current user is admin
+    /// </summary>
+    public bool IsAdmin => _currentUserService.IsAdmin;
+
     public event EventHandler? CreateTaskRequested;
 
     public KanbanBoardViewModel(
@@ -75,10 +80,14 @@ public partial class KanbanBoardViewModel : ViewModelBase
             var projects = await _kanbanService.GetActiveProjectsAsync();
             AvailableProjects = new ObservableCollection<Project>(projects);
 
-            // Auto-select first project
-            if (AvailableProjects.Any() && SelectedProject == null)
+            // Notify UI about HasNoProjects change
+            OnPropertyChanged(nameof(HasNoProjects));
+
+            // Don't auto-select - let user choose
+            // Clear selection if previously selected project no longer exists
+            if (SelectedProject != null && !AvailableProjects.Any(p => p.Id == SelectedProject.Id))
             {
-                SelectedProject = AvailableProjects.First();
+                SelectedProject = null;
             }
         }
         catch (Exception ex)
@@ -90,6 +99,16 @@ public partial class KanbanBoardViewModel : ViewModelBase
             IsLoading = false;
         }
     }
+
+    /// <summary>
+    /// Check if there are no projects available
+    /// </summary>
+    public bool HasNoProjects => !AvailableProjects.Any();
+
+    /// <summary>
+    /// Message to display when no projects exist
+    /// </summary>
+    public string NoProjectsMessage => "No active projects available. Please create a project first.";
 
     [RelayCommand]
     private async Task LoadBoardAsync()

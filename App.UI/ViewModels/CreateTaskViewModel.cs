@@ -141,6 +141,12 @@ public partial class CreateTaskViewModel : ViewModelBase
             SuccessMessage = null;
 
             // Validation
+            if (!_currentUserService.IsAdmin)
+            {
+                ErrorMessage = "Only administrators can create tasks";
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(Title))
             {
                 ErrorMessage = "Title is required";
