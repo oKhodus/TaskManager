@@ -80,7 +80,9 @@
                                 MinWidth="300"
                                 MaxWidth="350"
                                 BorderBrush="{StaticResource BorderDefaultBrush}"
-                                BorderThickness="1">
+                                BorderThickness="1"
+                                x:Name="ColumnBorder"
+                                DragDrop.AllowDrop="True">
                             <Grid RowDefinitions="Auto,*">
                                 <!-- Column Header -->
                                 <TextBlock Grid.Row="0"
