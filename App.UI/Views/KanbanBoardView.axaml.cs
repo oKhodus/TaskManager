@@ -7,6 +7,7 @@ using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using App.UI.ViewModels;
 using App.Domain.Enums;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace App.UI.Views;
 
@@ -36,9 +37,40 @@ public partial class KanbanBoardView : UserControl
     {
         if (DataContext is KanbanBoardViewModel viewModel)
         {
+            // Unsubscribe from previous viewModel if any
+            viewModel.TaskDetailRequested -= OnTaskDetailRequested;
+
+            // Subscribe to task detail request event
+            viewModel.TaskDetailRequested += OnTaskDetailRequested;
+
             // Load projects when view is ready
             await viewModel.LoadProjectsCommand.ExecuteAsync(null);
         }
+    }
+
+    private void OnTaskDetailRequested(object? sender, Guid taskId)
+    {
+        // Get TaskDetailWindowViewModel from DI
+        var serviceProvider = App.ServiceProvider;
+        if (serviceProvider == null) return;
+
+        var detailViewModel = serviceProvider.GetRequiredService<TaskDetailWindowViewModel>();
+
+        // Subscribe to TaskUpdated event to refresh board
+        detailViewModel.TaskUpdated += async (s, e) =>
+        {
+            if (DataContext is KanbanBoardViewModel boardViewModel)
+            {
+                await boardViewModel.RefreshBoardAsync();
+            }
+        };
+
+        // Get parent window
+        var parentWindow = this.VisualRoot as Window;
+        if (parentWindow == null) return;
+
+        // Show task detail window
+        TaskDetailWindow.ShowForTask(taskId, detailViewModel, parentWindow);
     }
 
     private void AttachDragHandlers()
@@ -62,6 +94,21 @@ public partial class KanbanBoardView : UserControl
                     }
                 };
             }
+        }
+    }
+
+    private void OnCardDoubleTapped(object? sender, TappedEventArgs e)
+    {
+        if (sender is Border border && border.DataContext is KanbanCardViewModel card)
+        {
+            // Trigger task detail window via ViewModel
+            if (DataContext is KanbanBoardViewModel viewModel)
+            {
+                viewModel.OpenTaskDetailCommand.Execute(card.Id);
+            }
+
+            // Mark event as handled to prevent drag from starting
+            e.Handled = true;
         }
     }
 

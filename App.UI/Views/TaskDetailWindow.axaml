@@ -1,0 +1,266 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:App.UI.ViewModels"
+        x:Class="App.UI.Views.TaskDetailWindow"
+        x:DataType="vm:TaskDetailWindowViewModel"
+        Title="Task Details"
+        Width="600"
+        Height="750"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource PrimaryBgBrush}">
+
+    <Border Padding="30" Background="{StaticResource SecondaryBgBrush}" CornerRadius="12" Margin="10">
+        <ScrollViewer Padding="0,0,10,0">
+            <StackPanel Spacing="18">
+                <!-- Header -->
+                <TextBlock Text="Task Details"
+                           FontSize="24"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource HeadingTextBrush}"/>
+
+                <!-- Task Type (Read-only) -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Task Type"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               FontSize="13"/>
+                    <Border Background="{StaticResource CardBgBrush}"
+                            CornerRadius="4"
+                            Padding="10,8">
+                        <TextBlock Text="{Binding TaskType}"
+                                   Foreground="{StaticResource InputTextBrush}"
+                                   FontSize="14"/>
+                    </Border>
+                </StackPanel>
+
+                <!-- Title -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Title *"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               FontSize="13"/>
+                    <TextBox Text="{Binding Title}"
+                             Watermark="Task title"
+                             IsEnabled="{Binding CanEditAllFields}"
+                             IsReadOnly="{Binding !CanEditAllFields}"/>
+                </StackPanel>
+
+                <!-- Description -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Description"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               FontSize="13"/>
+                    <TextBox Text="{Binding Description}"
+                             Watermark="Task description"
+                             AcceptsReturn="True"
+                             Height="100"
+                             TextWrapping="Wrap"
+                             IsEnabled="{Binding CanEditAllFields}"
+                             IsReadOnly="{Binding !CanEditAllFields}"/>
+                </StackPanel>
+
+                <!-- Status -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Status *"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               FontSize="13"/>
+                    <ComboBox ItemsSource="{Binding AvailableStatuses}"
+                              SelectedItem="{Binding SelectedStatus}"
+                              IsEnabled="{Binding CanEditStatus}"
+                              HorizontalAlignment="Stretch"/>
+                </StackPanel>
+
+                <!-- Priority -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Priority *"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               FontSize="13"/>
+                    <ComboBox ItemsSource="{Binding AvailablePriorities}"
+                              SelectedItem="{Binding SelectedPriority}"
+                              IsEnabled="{Binding CanEditAllFields}"
+                              HorizontalAlignment="Stretch"/>
+                </StackPanel>
+
+                <!-- Project -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Project *"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               FontSize="13"/>
+                    <ComboBox ItemsSource="{Binding AvailableProjects}"
+                              SelectedItem="{Binding SelectedProject}"
+                              PlaceholderText="Select project..."
+                              IsEnabled="{Binding IsAdmin}"
+                              HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <!-- Assigned To -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Assigned To"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               FontSize="13"/>
+                    <ComboBox ItemsSource="{Binding AvailableUsers}"
+                              SelectedItem="{Binding SelectedAssignee}"
+                              PlaceholderText="Unassigned"
+                              IsEnabled="{Binding IsAdmin}"
+                              HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <Run Text="{Binding FirstName}"/>
+                                    <Run Text=" "/>
+                                    <Run Text="{Binding LastName}"/>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <!-- Due Date -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Due Date"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               FontSize="13"/>
+                    <DatePicker SelectedDate="{Binding DueDate}"
+                                IsEnabled="{Binding CanEditAllFields}"
+                                HorizontalAlignment="Stretch"/>
+                </StackPanel>
+
+                <!-- Created By (Read-only) -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Created By"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               FontSize="13"/>
+                    <Border Background="{StaticResource CardBgBrush}"
+                            CornerRadius="4"
+                            Padding="10,8">
+                        <TextBlock Foreground="{StaticResource InputTextBrush}"
+                                   FontSize="14">
+                            <Run Text="{Binding CreatedBy.FirstName}"/>
+                            <Run Text=" "/>
+                            <Run Text="{Binding CreatedBy.LastName}"/>
+                        </TextBlock>
+                    </Border>
+                </StackPanel>
+
+                <!-- Created At (Read-only) -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Created At"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               FontSize="13"/>
+                    <Border Background="{StaticResource CardBgBrush}"
+                            CornerRadius="4"
+                            Padding="10,8">
+                        <TextBlock Text="{Binding CreatedAt, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}"
+                                   Foreground="{StaticResource InputTextBrush}"
+                                   FontSize="14"/>
+                    </Border>
+                </StackPanel>
+
+                <!-- Updated At (Read-only) -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Last Updated"
+                               Foreground="{StaticResource LabelTextBrush}"
+                               FontSize="13"/>
+                    <Border Background="{StaticResource CardBgBrush}"
+                            CornerRadius="4"
+                            Padding="10,8">
+                        <TextBlock Text="{Binding UpdatedAt, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}"
+                                   Foreground="{StaticResource InputTextBrush}"
+                                   FontSize="14"/>
+                    </Border>
+                </StackPanel>
+
+                <!-- Error Message -->
+                <Border Background="#3f1515"
+                        BorderBrush="#f87171"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="12"
+                        IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <TextBlock Text="{Binding ErrorMessage}"
+                               Foreground="#f87171"
+                               TextWrapping="Wrap"
+                               FontSize="12"/>
+                </Border>
+
+                <!-- Success Message -->
+                <Border Background="#1a3f1a"
+                        BorderBrush="#4ade80"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="12"
+                        IsVisible="{Binding SuccessMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <TextBlock Text="{Binding SuccessMessage}"
+                               Foreground="#4ade80"
+                               TextWrapping="Wrap"
+                               FontSize="12"/>
+                </Border>
+
+                <!-- Buttons -->
+                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="0,10,0,0">
+                    <Button Content="Cancel"
+                            Command="{Binding CloseCommand}"
+                            IsEnabled="{Binding !IsSaving}"
+                            Classes="secondary"
+                            Width="100"/>
+                    <Button Content="Save Changes"
+                            Command="{Binding SaveChangesCommand}"
+                            IsEnabled="{Binding !IsSaving}"
+                            IsVisible="{Binding CanEditStatus}"
+                            Width="140"/>
+                </StackPanel>
+
+                <!-- Loading Indicator -->
+                <TextBlock Text="Loading task details..."
+                           Foreground="{StaticResource TabActiveBrush}"
+                           FontSize="12"
+                           HorizontalAlignment="Center"
+                           IsVisible="{Binding IsLoading}"/>
+
+                <!-- Saving Indicator -->
+                <TextBlock Text="Saving changes..."
+                           Foreground="{StaticResource TabActiveBrush}"
+                           FontSize="12"
+                           HorizontalAlignment="Center"
+                           IsVisible="{Binding IsSaving}"/>
+
+                <!-- Read-Only Notice -->
+                <Border Background="#3f3f15"
+                        BorderBrush="#facc15"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="12"
+                        IsVisible="{Binding !CanEditStatus}">
+                    <TextBlock Text="Read-only mode: This task is not assigned to you"
+                               Foreground="#facc15"
+                               TextWrapping="Wrap"
+                               FontSize="12"/>
+                </Border>
+
+                <!-- Worker Edit Notice -->
+                <Border Background="#1a3f3f"
+                        BorderBrush="#4ade80"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="12"
+                        Margin="0,5,0,0"
+                        IsVisible="{Binding ShowWorkerEditNotice}">
+                    <StackPanel Spacing="5">
+                        <TextBlock Text="✓ You can edit the Status of this task"
+                                   Foreground="#4ade80"
+                                   FontSize="12"/>
+                        <TextBlock Text="Note: Only administrators can edit other fields (Title, Description, Priority, etc.)"
+                                   Foreground="#facc15"
+                                   TextWrapping="Wrap"
+                                   FontSize="11"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
+</Window>

@@ -30,6 +30,9 @@ public partial class KanbanCardViewModel : ViewModelBase
     private string _assignedToName = string.Empty;
 
     [ObservableProperty]
+    private Guid? _assignedToId;
+
+    [ObservableProperty]
     private string _projectName = string.Empty;
 
     /// <summary>
@@ -59,6 +62,7 @@ public partial class KanbanCardViewModel : ViewModelBase
             Priority = task.Priority,
             Status = task.Status,
             AssignedToName = assignedToName,
+            AssignedToId = task.AssignedToId,
             ProjectName = projectName
         };
     }
