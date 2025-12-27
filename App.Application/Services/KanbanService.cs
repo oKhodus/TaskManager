@@ -2,6 +2,7 @@ using App.Application.Interfaces.Repositories;
 using App.Application.Interfaces.Services;
 using App.Domain.Entities;
 using App.Domain.Enums;
+using Microsoft.Extensions.Logging;
 
 namespace App.Application.Services;
 
@@ -13,13 +14,16 @@ public class KanbanService : IKanbanService
 {
     private readonly ITaskRepository _taskRepository;
     private readonly IProjectRepository _projectRepository;
+    private readonly ILogger<KanbanService> _logger;
 
     public KanbanService(
         ITaskRepository taskRepository,
-        IProjectRepository projectRepository)
+        IProjectRepository projectRepository,
+        ILogger<KanbanService> logger)
     {
         _taskRepository = taskRepository;
         _projectRepository = projectRepository;
+        _logger = logger;
     }
 
     public async Task<Dictionary<Domain.Enums.TaskStatus, List<TaskBase>>> GetKanbanBoardAsync(
@@ -28,6 +32,10 @@ public class KanbanService : IKanbanService
         bool isAdmin,
         CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation(
+            "Loading Kanban board for ProjectId: {ProjectId}, UserId: {UserId}, IsAdmin: {IsAdmin}",
+            projectId, userId, isAdmin);
+
         // Get all tasks for the selected project
         var allTasks = await _taskRepository.ListAsync(cancellationToken);
 
@@ -55,17 +63,29 @@ public class KanbanService : IKanbanService
             groupedTasks[task.Status].Add(task);
         }
 
+        var totalTasks = groupedTasks.Sum(g => g.Value.Count);
+        _logger.LogInformation(
+            "Kanban board loaded successfully. ProjectId: {ProjectId}, TotalTasks: {TotalTasks}",
+            projectId, totalTasks);
+
         return groupedTasks;
     }
 
     public async Task MoveTaskAsync(Guid taskId, Domain.Enums.TaskStatus newStatus, CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation(
+            "Attempting to move task. TaskId: {TaskId}, NewStatus: {NewStatus}",
+            taskId, newStatus);
+
         var task = await _taskRepository.GetByIdAsync(taskId, cancellationToken);
 
         if (task == null)
         {
+            _logger.LogWarning("Task not found. TaskId: {TaskId}", taskId);
             throw new InvalidOperationException($"Task with ID {taskId} not found");
         }
+
+        var oldStatus = task.Status;
 
         // Update task status
         task.Status = newStatus;
@@ -77,6 +97,10 @@ public class KanbanService : IKanbanService
         }
 
         await _taskRepository.UpdateAsync(task, cancellationToken);
+
+        _logger.LogInformation(
+            "Task moved successfully. TaskId: {TaskId}, OldStatus: {OldStatus}, NewStatus: {NewStatus}",
+            taskId, oldStatus, newStatus);
     }
 
     public async Task<List<Project>> GetActiveProjectsAsync(CancellationToken cancellationToken = default)

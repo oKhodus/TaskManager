@@ -1,6 +1,7 @@
 using App.Application.Interfaces.Services;
 using App.Domain.Entities;
 using App.Domain.Enums;
+using Microsoft.Extensions.Logging;
 
 namespace App.Application.Services;
 
@@ -12,6 +13,12 @@ public class CurrentUserService : ICurrentUserService
 {
     private User? _currentUser;
     private readonly object _lock = new object();
+    private readonly ILogger<CurrentUserService> _logger;
+
+    public CurrentUserService(ILogger<CurrentUserService> logger)
+    {
+        _logger = logger;
+    }
 
     public User? CurrentUser
     {
@@ -39,6 +46,8 @@ public class CurrentUserService : ICurrentUserService
         lock (_lock)
         {
             _currentUser = user ?? throw new ArgumentNullException(nameof(user));
+            _logger.LogInformation("Current user set: UserId={UserId}, Username={Username}, Role={Role}",
+                user.Id, user.Username, user.Role);
         }
     }
 
@@ -46,7 +55,11 @@ public class CurrentUserService : ICurrentUserService
     {
         lock (_lock)
         {
+            var previousUserId = _currentUser?.Id;
+            var previousUsername = _currentUser?.Username;
             _currentUser = null;
+            _logger.LogInformation("Current user cleared. Previous user: UserId={UserId}, Username={Username}",
+                previousUserId, previousUsername);
         }
     }
 

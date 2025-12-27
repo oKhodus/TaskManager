@@ -7,6 +7,8 @@ using App.UI.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace App.UI;
 
@@ -14,6 +16,13 @@ public static class DI
 {
     public static void RegisterServices(IServiceCollection services, IConfiguration configuration)
     {
+        // Register Serilog
+        services.AddLogging(loggingBuilder =>
+        {
+            loggingBuilder.ClearProviders();
+            loggingBuilder.AddSerilog(dispose: false); // We'll dispose manually in App.axaml.cs
+        });
+
         // Register DbContext
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContext<ApplicationDbContext>(options =>

@@ -6,6 +6,7 @@ using App.Application.Interfaces.Services;
 using App.Domain.Enums;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 
 namespace App.UI.ViewModels;
 
@@ -16,6 +17,7 @@ public partial class CreateUserViewModel : ViewModelBase
 {
     private readonly IUserManagementService _userManagementService;
     private readonly ICurrentUserService _currentUserService;
+    private readonly ILogger<CreateUserViewModel> _logger;
 
     [ObservableProperty]
     [Required(ErrorMessage = "Username is required")]
@@ -66,10 +68,14 @@ public partial class CreateUserViewModel : ViewModelBase
 
     public CreateUserViewModel(
         IUserManagementService userManagementService,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        ILogger<CreateUserViewModel> logger)
     {
         _userManagementService = userManagementService;
         _currentUserService = currentUserService;
+        _logger = logger;
+
+        _logger.LogDebug("CreateUserViewModel initialized");
     }
 
     [RelayCommand]
@@ -85,6 +91,7 @@ public partial class CreateUserViewModel : ViewModelBase
             if (!_currentUserService.IsAdmin)
             {
                 ErrorMessage = "Only administrators can create users";
+                _logger.LogWarning("Non-admin user attempted to create user");
                 return;
             }
 
@@ -92,38 +99,47 @@ public partial class CreateUserViewModel : ViewModelBase
             if (string.IsNullOrWhiteSpace(Username))
             {
                 ErrorMessage = "Username is required";
+                _logger.LogWarning("User creation attempt with missing username");
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(Password))
             {
                 ErrorMessage = "Password is required";
+                _logger.LogWarning("User creation attempt with missing password for username: {Username}", Username);
                 return;
             }
 
             if (Password.Length < 6)
             {
                 ErrorMessage = "Password must be at least 6 characters";
+                _logger.LogWarning("User creation attempt with invalid password length for username: {Username}", Username);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(Email))
             {
                 ErrorMessage = "Email is required";
+                _logger.LogWarning("User creation attempt with missing email for username: {Username}", Username);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(FirstName))
             {
                 ErrorMessage = "First name is required";
+                _logger.LogWarning("User creation attempt with missing first name for username: {Username}", Username);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(LastName))
             {
                 ErrorMessage = "Last name is required";
+                _logger.LogWarning("User creation attempt with missing last name for username: {Username}", Username);
                 return;
             }
+
+            _logger.LogInformation("Creating user. Username: {Username}, Email: {Email}, Role: {Role}, IsActive: {IsActive}",
+                Username, Email, SelectedRole, IsActive);
 
             // Create user
             var user = await _userManagementService.CreateUserAsync(
@@ -139,7 +155,12 @@ public partial class CreateUserViewModel : ViewModelBase
             if (!IsActive && user.IsActive)
             {
                 await _userManagementService.DeactivateUserAsync(user.Id);
+                _logger.LogInformation("User deactivated after creation. UserId: {UserId}, Username: {Username}",
+                    user.Id, Username);
             }
+
+            _logger.LogInformation("User created successfully. UserId: {UserId}, Username: {Username}, Role: {Role}",
+                user.Id, Username, SelectedRole);
 
             SuccessMessage = $"User '{Username}' created successfully!";
 
@@ -153,10 +174,13 @@ public partial class CreateUserViewModel : ViewModelBase
         catch (InvalidOperationException ex)
         {
             ErrorMessage = ex.Message;
+            _logger.LogWarning(ex, "Invalid operation during user creation for username: {Username}", Username);
         }
         catch (Exception ex)
         {
             ErrorMessage = $"Failed to create user: {ex.Message}";
+            _logger.LogError(ex, "Failed to create user. Username: {Username}, Email: {Email}",
+                Username, Email);
         }
         finally
         {
@@ -176,5 +200,6 @@ public partial class CreateUserViewModel : ViewModelBase
         IsActive = true;
         ErrorMessage = null;
         SuccessMessage = null;
+        _logger.LogDebug("User creation form cleared");
     }
 }

@@ -9,6 +9,7 @@ using App.Domain.Entities;
 using App.Domain.Enums;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 using TaskStatus = App.Domain.Enums.TaskStatus;
 
 namespace App.UI.ViewModels;
@@ -18,6 +19,7 @@ public partial class TaskMasterViewModel : ViewModelBase
     private readonly ITaskService _taskService;
     private readonly IExportService _exportService;
     private readonly TaskDetailViewModel _taskDetailViewModel;
+    private readonly ILogger<TaskMasterViewModel> _logger;
 
     [ObservableProperty]
     private ObservableCollection<TaskBase> _tasks = new();
@@ -61,21 +63,32 @@ public partial class TaskMasterViewModel : ViewModelBase
     public TaskMasterViewModel(
         ITaskService taskService,
         IExportService exportService,
-        TaskDetailViewModel taskDetailViewModel)
+        TaskDetailViewModel taskDetailViewModel,
+        ILogger<TaskMasterViewModel> logger)
     {
         _taskService = taskService;
         _exportService = exportService;
         _taskDetailViewModel = taskDetailViewModel;
+        _logger = logger;
+
+        _logger.LogDebug("TaskMasterViewModel initialized");
     }
 
     [RelayCommand]
     private async Task LoadTasksAsync()
     {
+        _logger.LogInformation("Loading all tasks...");
         IsLoading = true;
         try
         {
             var tasks = await _taskService.GetAllTasksAsync();
             Tasks = new ObservableCollection<TaskBase>(tasks);
+            _logger.LogInformation("Loaded {TaskCount} tasks", tasks.Count());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load tasks");
+            throw;
         }
         finally
         {
@@ -86,6 +99,8 @@ public partial class TaskMasterViewModel : ViewModelBase
     [RelayCommand]
     private async Task SearchAsync()
     {
+        _logger.LogInformation("Searching tasks with SearchText={SearchText}, Status={Status}, Priority={Priority}",
+            SearchText, SelectedStatus, SelectedPriority);
         IsLoading = true;
         try
         {
@@ -109,6 +124,12 @@ public partial class TaskMasterViewModel : ViewModelBase
             }
 
             Tasks = new ObservableCollection<TaskBase>(tasks);
+            _logger.LogInformation("Search completed, found {TaskCount} tasks", tasks.Count());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Search failed");
+            throw;
         }
         finally
         {
@@ -156,14 +177,19 @@ public partial class TaskMasterViewModel : ViewModelBase
     private async Task ExportToCsvAsync()
     {
         if (Tasks.Count == 0)
+        {
+            _logger.LogWarning("Export attempted with no tasks available");
             return;
+        }
 
         try
         {
             var fileName = $"Tasks_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
             var filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName);
 
+            _logger.LogInformation("Exporting {TaskCount} tasks to {FilePath}", Tasks.Count, filePath);
             await _exportService.ExportToCsvAsync(Tasks, filePath);
+            _logger.LogInformation("Export completed successfully");
 
             // TODO: Show success notification to user
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
@@ -175,8 +201,8 @@ public partial class TaskMasterViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Export to CSV failed");
             // TODO: Show error notification to user
-            Console.WriteLine($"Export failed: {ex.Message}");
         }
     }
 }
