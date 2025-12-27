@@ -15,6 +15,7 @@ public partial class KanbanBoardView : UserControl
 {
     private KanbanCardViewModel? _draggedCard;
     private TaskStatus? _draggedFromStatus;
+    private bool _projectsLoaded;
 
     public KanbanBoardView()
     {
@@ -24,13 +25,20 @@ public partial class KanbanBoardView : UserControl
         Loaded += OnLoaded;
     }
 
-    private void OnLoaded(object? sender, RoutedEventArgs e)
+    private async void OnLoaded(object? sender, RoutedEventArgs e)
     {
         // Attach pointer pressed handlers to all card borders for drag initiation
         AttachDragHandlers();
 
         // Subscribe to DataContext changes to reload
         DataContextChanged += OnDataContextChanged;
+
+        // Load projects immediately if DataContext is already set
+        if (DataContext is KanbanBoardViewModel viewModel && !_projectsLoaded)
+        {
+            _projectsLoaded = true;
+            await viewModel.LoadProjectsCommand.ExecuteAsync(null);
+        }
     }
 
     private async void OnDataContextChanged(object? sender, EventArgs e)
@@ -43,8 +51,11 @@ public partial class KanbanBoardView : UserControl
             // Subscribe to task detail request event
             viewModel.TaskDetailRequested += OnTaskDetailRequested;
 
-            // Load projects when view is ready
+            // Load projects when DataContext changes (new login)
+            // Reset flag for new ViewModel instance
+            _projectsLoaded = false;
             await viewModel.LoadProjectsCommand.ExecuteAsync(null);
+            _projectsLoaded = true;
         }
     }
 
