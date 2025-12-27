@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -105,13 +106,22 @@ public partial class KanbanBoardView : UserControl
         }
 
         // Find which column the card was dropped on
-        var dropTarget = e.Source as Control;
+        // Try to get the drop target from the event source
+        Control? dropTarget = null;
+
+        // First try e.Source
+        if (e.Source is Control sourceControl)
+        {
+            dropTarget = sourceControl;
+        }
+
+        // If that doesn't work, try getting the visual element at the pointer position
         if (dropTarget == null)
         {
             return;
         }
 
-        // Walk up the visual tree to find the column
+        // Walk up the visual tree to find the column border
         var column = FindParentColumn(dropTarget);
         if (column?.DataContext is KanbanColumnViewModel columnViewModel)
         {
@@ -130,15 +140,24 @@ public partial class KanbanBoardView : UserControl
 
     private Control? FindParentColumn(Control control)
     {
-        var current = control.GetVisualParent();
+        // Start from the control itself, then walk up
+        var current = control as Visual;
 
         while (current != null)
         {
-            if (current is Border border &&
-                border.DataContext is KanbanColumnViewModel)
+            // Check if this is a column border (has Name="ColumnBorder")
+            if (current is Border border && border.Name == "ColumnBorder")
             {
                 return border;
             }
+
+            // Also check by DataContext for backwards compatibility
+            if (current is Border borderWithContext &&
+                borderWithContext.DataContext is KanbanColumnViewModel)
+            {
+                return borderWithContext;
+            }
+
             current = current.GetVisualParent();
         }
 
