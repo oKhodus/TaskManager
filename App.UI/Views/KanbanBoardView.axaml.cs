@@ -33,9 +33,13 @@ public partial class KanbanBoardView : UserControl
         // Subscribe to DataContext changes to reload
         DataContextChanged += OnDataContextChanged;
 
-        // Load projects immediately if DataContext is already set
+        // If DataContext is already set, subscribe to events and load projects
         if (DataContext is KanbanBoardViewModel viewModel && !_projectsLoaded)
         {
+            // Subscribe to task detail request event
+            viewModel.TaskDetailRequested += OnTaskDetailRequested;
+
+            // Load projects
             _projectsLoaded = true;
             await viewModel.LoadProjectsCommand.ExecuteAsync(null);
         }
