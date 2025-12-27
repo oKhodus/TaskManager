@@ -39,14 +39,8 @@ public class KanbanService : IKanbanService
         // Get all tasks for the selected project
         var allTasks = await _taskRepository.ListAsync(cancellationToken);
 
-        // Filter by project
+        // Filter by project - show ALL tasks to all users (Admin and Worker)
         var projectTasks = allTasks.Where(t => t.ProjectId == projectId);
-
-        // If worker (not admin), filter to only show their assigned tasks
-        if (!isAdmin)
-        {
-            projectTasks = projectTasks.Where(t => t.AssignedToId == userId);
-        }
 
         // Group by status for Kanban columns
         var groupedTasks = new Dictionary<Domain.Enums.TaskStatus, List<TaskBase>>();

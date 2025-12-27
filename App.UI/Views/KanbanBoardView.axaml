@@ -109,7 +109,8 @@
                                                         BorderBrush="{Binding PriorityColor}"
                                                         Cursor="Hand"
                                                         x:Name="CardBorder"
-                                                        DragDrop.AllowDrop="True">
+                                                        DragDrop.AllowDrop="True"
+                                                        DoubleTapped="OnCardDoubleTapped">
                                                     <StackPanel Spacing="8">
                                                         <!-- Title -->
                                                         <TextBlock Text="{Binding Title}"
@@ -179,9 +180,33 @@
                 Margin="50"
                 VerticalAlignment="Top"
                 IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
-            <TextBlock Text="{Binding ErrorMessage}"
-                       Foreground="#f87171"
-                       TextWrapping="Wrap"/>
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0"
+                           Text="{Binding ErrorMessage}"
+                           Foreground="#f87171"
+                           TextWrapping="Wrap"
+                           VerticalAlignment="Center"/>
+
+                <!-- Close Button -->
+                <Button Grid.Column="1"
+                        Content="✕"
+                        Command="{Binding $parent[UserControl].DataContext.ClearErrorCommand}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Foreground="#f87171"
+                        FontSize="18"
+                        FontWeight="Bold"
+                        Padding="8,0"
+                        Margin="10,0,0,0"
+                        Cursor="Hand"
+                        VerticalAlignment="Center">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Foreground" Value="#fca5a5"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+            </Grid>
         </Border>
     </Grid>
 </UserControl>

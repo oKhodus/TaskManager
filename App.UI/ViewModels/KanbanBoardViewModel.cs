@@ -45,6 +45,7 @@ public partial class KanbanBoardViewModel : ViewModelBase
     public bool IsAdmin => _currentUserService.IsAdmin;
 
     public event EventHandler? CreateTaskRequested;
+    public event EventHandler<Guid>? TaskDetailRequested;
 
     public KanbanBoardViewModel(
         IKanbanService kanbanService,
@@ -201,10 +202,23 @@ public partial class KanbanBoardViewModel : ViewModelBase
             return; // No change
         }
 
+        // Permission check: Workers can only move tasks assigned to them
+        var isAdmin = _currentUserService.IsAdmin;
+        var currentUserId = _currentUserService.UserId;
+        var isAssignedToCurrentUser = card.AssignedToId.HasValue && card.AssignedToId.Value == currentUserId;
+
+        if (!isAdmin && !isAssignedToCurrentUser)
+        {
+            ErrorMessage = "You can only move tasks assigned to you";
+            _logger.LogWarning("Worker attempted to move task not assigned to them. TaskId: {TaskId}, WorkerId: {WorkerId}, AssignedToId: {AssignedToId}",
+                card.Id, currentUserId, card.AssignedToId);
+            return;
+        }
+
         try
         {
-            _logger.LogInformation("Moving task. TaskId: {TaskId}, From: {OldStatus}, To: {NewStatus}",
-                card.Id, card.Status, newStatus);
+            _logger.LogInformation("Moving task. TaskId: {TaskId}, From: {OldStatus}, To: {NewStatus}, UserId: {UserId}, IsAdmin: {IsAdmin}",
+                card.Id, card.Status, newStatus, currentUserId, isAdmin);
 
             // Update in database
             await _kanbanService.MoveTaskAsync(card.Id, newStatus);
@@ -239,12 +253,32 @@ public partial class KanbanBoardViewModel : ViewModelBase
     }
 
     /// <summary>
+    /// Open task detail window for viewing/editing
+    /// </summary>
+    [RelayCommand]
+    private void OpenTaskDetail(Guid taskId)
+    {
+        _logger.LogInformation("Task detail window requested. TaskId: {TaskId}", taskId);
+        TaskDetailRequested?.Invoke(this, taskId);
+    }
+
+    /// <summary>
     /// Refresh board after task creation or update
     /// </summary>
     public async Task RefreshBoardAsync()
     {
         _logger.LogDebug("Board refresh requested");
         await LoadBoardAsync();
+    }
+
+    /// <summary>
+    /// Clear error message
+    /// </summary>
+    [RelayCommand]
+    private void ClearError()
+    {
+        ErrorMessage = null;
+        _logger.LogDebug("Error message cleared by user");
     }
 
     partial void OnSelectedProjectChanged(Project? value)
