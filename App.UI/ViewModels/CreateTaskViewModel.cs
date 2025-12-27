@@ -8,6 +8,7 @@ using App.Domain.Entities;
 using App.Domain.Enums;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 
 namespace App.UI.ViewModels;
 
@@ -21,6 +22,7 @@ public partial class CreateTaskViewModel : ViewModelBase
     private readonly IProjectRepository _projectRepository;
     private readonly IUserRepository _userRepository;
     private readonly ICurrentUserService _currentUserService;
+    private readonly ILogger<CreateTaskViewModel> _logger;
 
     [ObservableProperty]
     private string _title = string.Empty;
@@ -73,14 +75,17 @@ public partial class CreateTaskViewModel : ViewModelBase
         ITaskRepository taskRepository,
         IProjectRepository projectRepository,
         IUserRepository userRepository,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        ILogger<CreateTaskViewModel> logger)
     {
         _taskRepository = taskRepository;
         _projectRepository = projectRepository;
         _userRepository = userRepository;
         _currentUserService = currentUserService;
+        _logger = logger;
 
         InitializeLists();
+        _logger.LogDebug("CreateTaskViewModel initialized");
     }
 
     private void InitializeLists()
@@ -106,6 +111,8 @@ public partial class CreateTaskViewModel : ViewModelBase
             IsLoading = true;
             ErrorMessage = null;
 
+            _logger.LogDebug("Loading projects and users for task creation");
+
             // Load projects
             var projects = await _projectRepository.ListAsync();
             AvailableProjects = new ObservableCollection<Project>(projects.Where(p => p.IsActive).OrderBy(p => p.Name));
@@ -113,10 +120,14 @@ public partial class CreateTaskViewModel : ViewModelBase
             // Load users for assignment
             var users = await _userRepository.ListAsync();
             AvailableUsers = new ObservableCollection<User>(users.Where(u => u.IsActive).OrderBy(u => u.FirstName));
+
+            _logger.LogInformation("Data loaded. Projects: {ProjectCount}, Users: {UserCount}",
+                AvailableProjects.Count, AvailableUsers.Count);
         }
         catch (Exception ex)
         {
             ErrorMessage = $"Failed to load data: {ex.Message}";
+            _logger.LogError(ex, "Failed to load projects and users for task creation");
         }
         finally
         {
@@ -130,6 +141,8 @@ public partial class CreateTaskViewModel : ViewModelBase
     public void SetProject(Project project)
     {
         SelectedProject = project;
+        _logger.LogDebug("Project pre-selected. ProjectId: {ProjectId}, ProjectName: {ProjectName}",
+            project.Id, project.Name);
     }
 
     [RelayCommand]
@@ -144,28 +157,35 @@ public partial class CreateTaskViewModel : ViewModelBase
             if (!_currentUserService.IsAdmin)
             {
                 ErrorMessage = "Only administrators can create tasks";
+                _logger.LogWarning("Non-admin user attempted to create task");
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(Title))
             {
                 ErrorMessage = "Title is required";
+                _logger.LogWarning("Task creation attempt with missing title");
                 return;
             }
 
             if (SelectedProject == null)
             {
                 ErrorMessage = "Please select a project";
+                _logger.LogWarning("Task creation attempt with no project selected");
                 return;
             }
 
             if (_currentUserService.CurrentUser == null)
             {
                 ErrorMessage = "User not authenticated";
+                _logger.LogWarning("Task creation attempt with no authenticated user");
                 return;
             }
 
             IsLoading = true;
+
+            _logger.LogInformation("Creating {TaskType} task. Title: {Title}, Project: {ProjectId}, Status: {Status}, Priority: {Priority}",
+                SelectedTaskType, Title, SelectedProject.Id, SelectedStatus, SelectedPriority);
 
             // Create task based on type
             TaskBase newTask = SelectedTaskType == "Bug"
@@ -198,6 +218,9 @@ public partial class CreateTaskViewModel : ViewModelBase
 
             await _taskRepository.AddAsync(newTask);
 
+            _logger.LogInformation("Task created successfully. TaskId: {TaskId}, Type: {TaskType}, Title: {Title}",
+                newTask.Id, SelectedTaskType, Title);
+
             SuccessMessage = $"Task '{Title}' created successfully!";
 
             // Notify listeners
@@ -210,6 +233,8 @@ public partial class CreateTaskViewModel : ViewModelBase
         catch (Exception ex)
         {
             ErrorMessage = $"Failed to create task: {ex.Message}";
+            _logger.LogError(ex, "Failed to create task. Title: {Title}, Project: {ProjectId}",
+                Title, SelectedProject?.Id);
         }
         finally
         {
@@ -229,5 +254,6 @@ public partial class CreateTaskViewModel : ViewModelBase
         SelectedStatus = Domain.Enums.TaskStatus.Todo;
         ErrorMessage = null;
         SuccessMessage = null;
+        _logger.LogDebug("Task creation form cleared");
     }
 }

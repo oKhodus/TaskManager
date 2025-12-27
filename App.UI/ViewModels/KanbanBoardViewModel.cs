@@ -8,6 +8,7 @@ using App.Domain.Entities;
 using App.Domain.Enums;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 
 namespace App.UI.ViewModels;
 
@@ -21,6 +22,7 @@ public partial class KanbanBoardViewModel : ViewModelBase
     private readonly ICurrentUserService _currentUserService;
     private readonly IUserRepository _userRepository;
     private readonly IProjectRepository _projectRepository;
+    private readonly ILogger<KanbanBoardViewModel> _logger;
 
     [ObservableProperty]
     private ObservableCollection<KanbanColumnViewModel> _columns = new();
@@ -48,15 +50,18 @@ public partial class KanbanBoardViewModel : ViewModelBase
         IKanbanService kanbanService,
         ICurrentUserService currentUserService,
         IUserRepository userRepository,
-        IProjectRepository projectRepository)
+        IProjectRepository projectRepository,
+        ILogger<KanbanBoardViewModel> logger)
     {
         _kanbanService = kanbanService;
         _currentUserService = currentUserService;
         _userRepository = userRepository;
         _projectRepository = projectRepository;
+        _logger = logger;
 
         // Initialize columns for all statuses
         InitializeColumns();
+        _logger.LogDebug("KanbanBoardViewModel initialized with {ColumnCount} columns", Columns.Count);
     }
 
     private void InitializeColumns()
@@ -77,8 +82,11 @@ public partial class KanbanBoardViewModel : ViewModelBase
             IsLoading = true;
             ErrorMessage = null;
 
+            _logger.LogDebug("Loading active projects");
             var projects = await _kanbanService.GetActiveProjectsAsync();
             AvailableProjects = new ObservableCollection<Project>(projects);
+
+            _logger.LogInformation("Loaded {ProjectCount} active projects", projects.Count());
 
             // Notify UI about HasNoProjects change
             OnPropertyChanged(nameof(HasNoProjects));
@@ -87,12 +95,14 @@ public partial class KanbanBoardViewModel : ViewModelBase
             // Clear selection if previously selected project no longer exists
             if (SelectedProject != null && !AvailableProjects.Any(p => p.Id == SelectedProject.Id))
             {
+                _logger.LogDebug("Previously selected project no longer exists. Clearing selection");
                 SelectedProject = null;
             }
         }
         catch (Exception ex)
         {
             ErrorMessage = $"Failed to load projects: {ex.Message}";
+            _logger.LogError(ex, "Failed to load projects");
         }
         finally
         {
@@ -115,6 +125,7 @@ public partial class KanbanBoardViewModel : ViewModelBase
     {
         if (SelectedProject == null || _currentUserService.CurrentUser == null)
         {
+            _logger.LogDebug("LoadBoardAsync skipped - no selected project or current user");
             return;
         }
 
@@ -125,6 +136,9 @@ public partial class KanbanBoardViewModel : ViewModelBase
 
             var userId = _currentUserService.UserId!.Value;
             var isAdmin = _currentUserService.IsAdmin;
+
+            _logger.LogDebug("Loading Kanban board for ProjectId: {ProjectId}, UserId: {UserId}, IsAdmin: {IsAdmin}",
+                SelectedProject.Id, userId, isAdmin);
 
             // Get tasks grouped by status
             var taskGroups = await _kanbanService.GetKanbanBoardAsync(
@@ -142,6 +156,8 @@ public partial class KanbanBoardViewModel : ViewModelBase
                 column.ClearCards();
             }
 
+            var totalTasksLoaded = 0;
+
             // Populate columns with cards
             foreach (var (status, tasks) in taskGroups)
             {
@@ -156,12 +172,17 @@ public partial class KanbanBoardViewModel : ViewModelBase
 
                     var card = KanbanCardViewModel.FromTask(task, assignedToName, SelectedProject.Name);
                     column.AddCard(card);
+                    totalTasksLoaded++;
                 }
             }
+
+            _logger.LogInformation("Kanban board loaded successfully. ProjectId: {ProjectId}, Total Tasks: {TaskCount}",
+                SelectedProject.Id, totalTasksLoaded);
         }
         catch (Exception ex)
         {
             ErrorMessage = $"Failed to load board: {ex.Message}";
+            _logger.LogError(ex, "Failed to load Kanban board for ProjectId: {ProjectId}", SelectedProject?.Id);
         }
         finally
         {
@@ -176,11 +197,15 @@ public partial class KanbanBoardViewModel : ViewModelBase
     {
         if (card.Status == newStatus)
         {
+            _logger.LogDebug("Card not moved - new status same as current. TaskId: {TaskId}", card.Id);
             return; // No change
         }
 
         try
         {
+            _logger.LogInformation("Moving task. TaskId: {TaskId}, From: {OldStatus}, To: {NewStatus}",
+                card.Id, card.Status, newStatus);
+
             // Update in database
             await _kanbanService.MoveTaskAsync(card.Id, newStatus);
 
@@ -193,17 +218,23 @@ public partial class KanbanBoardViewModel : ViewModelBase
                 oldColumn.RemoveCard(card);
                 card.Status = newStatus;
                 newColumn.AddCard(card);
+
+                _logger.LogInformation("Task moved successfully. TaskId: {TaskId}, NewStatus: {NewStatus}",
+                    card.Id, newStatus);
             }
         }
         catch (Exception ex)
         {
             ErrorMessage = $"Failed to move task: {ex.Message}";
+            _logger.LogError(ex, "Failed to move task. TaskId: {TaskId}, NewStatus: {NewStatus}",
+                card.Id, newStatus);
         }
     }
 
     [RelayCommand]
     private void OpenCreateTaskDialog()
     {
+        _logger.LogDebug("Create task dialog requested");
         CreateTaskRequested?.Invoke(this, EventArgs.Empty);
     }
 
@@ -212,6 +243,7 @@ public partial class KanbanBoardViewModel : ViewModelBase
     /// </summary>
     public async Task RefreshBoardAsync()
     {
+        _logger.LogDebug("Board refresh requested");
         await LoadBoardAsync();
     }
 
@@ -219,7 +251,13 @@ public partial class KanbanBoardViewModel : ViewModelBase
     {
         if (value != null)
         {
+            _logger.LogInformation("Project selected. ProjectId: {ProjectId}, ProjectName: {ProjectName}",
+                value.Id, value.Name);
             _ = LoadBoardAsync();
+        }
+        else
+        {
+            _logger.LogDebug("Project selection cleared");
         }
     }
 }

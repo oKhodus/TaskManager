@@ -2,6 +2,7 @@ using App.Application.Interfaces.Repositories;
 using App.Application.Interfaces.Services;
 using App.Domain.Entities;
 using App.Domain.Enums;
+using Microsoft.Extensions.Logging;
 
 namespace App.Application.Services;
 
@@ -12,13 +13,16 @@ public class UserManagementService : IUserManagementService
 {
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly ILogger<UserManagementService> _logger;
 
     public UserManagementService(
         IUserRepository userRepository,
-        IPasswordHasher passwordHasher)
+        IPasswordHasher passwordHasher,
+        ILogger<UserManagementService> logger)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
+        _logger = logger;
     }
 
     public async Task<IEnumerable<User>> GetAllUsersAsync(CancellationToken cancellationToken = default)
@@ -43,6 +47,10 @@ public class UserManagementService : IUserManagementService
         UserRole role,
         CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation(
+            "Creating new user. Username: {Username}, Email: {Email}, Role: {Role}",
+            username, email, role);
+
         // Validate input
         if (string.IsNullOrWhiteSpace(username))
             throw new ArgumentException("Username is required", nameof(username));
@@ -61,11 +69,17 @@ public class UserManagementService : IUserManagementService
 
         // Check if username already exists
         if (!await IsUsernameAvailableAsync(username, cancellationToken))
+        {
+            _logger.LogWarning("Username already taken. Username: {Username}", username);
             throw new InvalidOperationException($"Username '{username}' is already taken");
+        }
 
         // Check if email already exists
         if (!await IsEmailAvailableAsync(email, cancellationToken))
+        {
+            _logger.LogWarning("Email already registered. Email: {Email}", email);
             throw new InvalidOperationException($"Email '{email}' is already registered");
+        }
 
         // Create user
         var user = new User
@@ -80,7 +94,13 @@ public class UserManagementService : IUserManagementService
             CreatedAt = DateTime.UtcNow
         };
 
-        return await _userRepository.AddAsync(user, cancellationToken);
+        var createdUser = await _userRepository.AddAsync(user, cancellationToken);
+
+        _logger.LogInformation(
+            "User created successfully. UserId: {UserId}, Username: {Username}, Role: {Role}",
+            createdUser.Id, createdUser.Username, createdUser.Role);
+
+        return createdUser;
     }
 
     public async Task<User> UpdateUserAsync(User user, CancellationToken cancellationToken = default)
@@ -88,31 +108,54 @@ public class UserManagementService : IUserManagementService
         if (user == null)
             throw new ArgumentNullException(nameof(user));
 
+        _logger.LogInformation(
+            "Updating user. UserId: {UserId}, Username: {Username}",
+            user.Id, user.Username);
+
         user.UpdatedAt = DateTime.UtcNow;
         await _userRepository.UpdateAsync(user, cancellationToken);
+
+        _logger.LogInformation("User updated successfully. UserId: {UserId}", user.Id);
+
         return user;
     }
 
     public async Task DeactivateUserAsync(Guid userId, CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("Deactivating user. UserId: {UserId}", userId);
+
         var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
         if (user == null)
+        {
+            _logger.LogWarning("User not found for deactivation. UserId: {UserId}", userId);
             throw new InvalidOperationException($"User with ID {userId} not found");
+        }
 
         user.IsActive = false;
         user.UpdatedAt = DateTime.UtcNow;
         await _userRepository.UpdateAsync(user, cancellationToken);
+
+        _logger.LogInformation("User deactivated successfully. UserId: {UserId}, Username: {Username}",
+            userId, user.Username);
     }
 
     public async Task ActivateUserAsync(Guid userId, CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("Activating user. UserId: {UserId}", userId);
+
         var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
         if (user == null)
+        {
+            _logger.LogWarning("User not found for activation. UserId: {UserId}", userId);
             throw new InvalidOperationException($"User with ID {userId} not found");
+        }
 
         user.IsActive = true;
         user.UpdatedAt = DateTime.UtcNow;
         await _userRepository.UpdateAsync(user, cancellationToken);
+
+        _logger.LogInformation("User activated successfully. UserId: {UserId}, Username: {Username}",
+            userId, user.Username);
     }
 
     public async Task<bool> IsUsernameAvailableAsync(string username, CancellationToken cancellationToken = default)

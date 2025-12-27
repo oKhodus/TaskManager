@@ -151,6 +151,11 @@ node_modules/
 .DS_Store
 
 ## Project-specific
+PROJECT_GUIDELINES.md
+BRANCHES.md
+SESSION_CONTEXT.md
+TEST_RESULTS.md
+BUGS.md
 INSTRUCTIONS.md
 .claude/
 reference/

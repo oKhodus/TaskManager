@@ -1,16 +1,21 @@
 using App.Application.Interfaces.Repositories;
 using App.Application.Interfaces.Services;
 using App.Domain.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace App.Application.Services;
 
 public class ProjectService : IProjectService
 {
     private readonly IProjectRepository _projectRepository;
+    private readonly ILogger<ProjectService> _logger;
 
-    public ProjectService(IProjectRepository projectRepository)
+    public ProjectService(
+        IProjectRepository projectRepository,
+        ILogger<ProjectService> logger)
     {
         _projectRepository = projectRepository;
+        _logger = logger;
     }
 
     public async Task<IEnumerable<Project>> GetAllProjectsAsync(CancellationToken cancellationToken = default)
@@ -35,11 +40,15 @@ public class ProjectService : IProjectService
 
     public async Task<Project> CreateProjectAsync(Project project, CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("Creating project: Name={Name}, Key={Key}", project.Name, project.Key);
+
         // Business logic: Set creation timestamp
         project.CreatedAt = DateTime.UtcNow;
         project.IsActive = true;
 
-        return await _projectRepository.AddAsync(project, cancellationToken);
+        var result = await _projectRepository.AddAsync(project, cancellationToken);
+        _logger.LogInformation("Project created successfully: Id={ProjectId}, Name={Name}", result.Id, result.Name);
+        return result;
     }
 
     public async Task UpdateProjectAsync(Project project, CancellationToken cancellationToken = default)
@@ -52,6 +61,7 @@ public class ProjectService : IProjectService
 
     public async Task DeleteProjectAsync(Guid id, CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("Deleting project (soft delete): Id={ProjectId}", id);
         var project = await _projectRepository.GetByIdAsync(id, cancellationToken);
         if (project != null)
         {
@@ -59,6 +69,11 @@ public class ProjectService : IProjectService
             project.IsActive = false;
             project.UpdatedAt = DateTime.UtcNow;
             await _projectRepository.UpdateAsync(project, cancellationToken);
+            _logger.LogInformation("Project soft-deleted successfully: Id={ProjectId}, Name={Name}", id, project.Name);
+        }
+        else
+        {
+            _logger.LogWarning("Project not found for deletion: Id={ProjectId}", id);
         }
     }
 

@@ -3,7 +3,7 @@
 # Default target
 help:
 	@echo "╔════════════════════════════════════════════════════════════════╗"
-	@echo "║                    TaskManager - Make Commands                ║"
+	@echo "║                    TaskManager - Make Commands                 ║"
 	@echo "╠════════════════════════════════════════════════════════════════╣"
 	@echo "║                                                                ║"
 	@echo "║  make run                                                      ║"
