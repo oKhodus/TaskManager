@@ -205,7 +205,7 @@ public partial class CreateTaskViewModel : ViewModelBase
             IsLoading = true;
 
             _logger.LogInformation("Creating {TaskType} task. Title: {Title}, Project: {ProjectId}, Status: {Status}, Priority: {Priority}",
-                SelectedTaskType, Title, SelectedProject.Id, SelectedStatus, SelectedPriority);
+                SelectedTaskType, Title, SelectedProject?.Id, SelectedStatus, SelectedPriority);
 
             // Create task based on type
             TaskBase newTask = SelectedTaskType == "Bug"
@@ -216,7 +216,7 @@ public partial class CreateTaskViewModel : ViewModelBase
                     Description = Description,
                     Status = SelectedStatus,
                     Priority = SelectedPriority,
-                    ProjectId = SelectedProject.Id,
+                    ProjectId = SelectedProject!.Id,
                     CreatedById = _currentUserService.UserId!.Value,
                     AssignedToId = SelectedAssignee?.Id,
                     CreatedAt = DateTime.UtcNow,
@@ -229,7 +229,7 @@ public partial class CreateTaskViewModel : ViewModelBase
                     Description = Description,
                     Status = SelectedStatus,
                     Priority = SelectedPriority,
-                    ProjectId = SelectedProject.Id,
+                    ProjectId = SelectedProject!.Id,
                     CreatedById = _currentUserService.UserId!.Value,
                     AssignedToId = SelectedAssignee?.Id,
                     CreatedAt = DateTime.UtcNow,
