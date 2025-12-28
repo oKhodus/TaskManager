@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using App.Application.Interfaces.Services;
 using App.Domain.Entities;
@@ -8,6 +7,10 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace App.UI.ViewModels;
 
+/// <summary>
+/// ViewModel for project details
+/// Validation performed manually for better UX
+/// </summary>
 public partial class ProjectDetailViewModel : ViewModelBase
 {
     private readonly IProjectService _projectService;
@@ -16,16 +19,12 @@ public partial class ProjectDetailViewModel : ViewModelBase
     private Guid _id;
 
     [ObservableProperty]
-    [Required(ErrorMessage = "Project name is required")]
-    [MinLength(3, ErrorMessage = "Project name must be at least 3 characters")]
     private string _name = string.Empty;
 
     [ObservableProperty]
     private string? _description;
 
     [ObservableProperty]
-    [Required(ErrorMessage = "Project key is required")]
-    [MaxLength(10, ErrorMessage = "Project key must not exceed 10 characters")]
     private string _key = string.Empty;
 
     [ObservableProperty]
@@ -39,6 +38,22 @@ public partial class ProjectDetailViewModel : ViewModelBase
 
     [ObservableProperty]
     private bool _isEditMode;
+
+    [ObservableProperty]
+    private string? _nameError;
+
+    [ObservableProperty]
+    private string? _keyError;
+
+    partial void OnNameChanged(string value)
+    {
+        NameError = null;
+    }
+
+    partial void OnKeyChanged(string value)
+    {
+        KeyError = null;
+    }
 
     public ProjectDetailViewModel(IProjectService projectService)
     {
@@ -72,6 +87,27 @@ public partial class ProjectDetailViewModel : ViewModelBase
     [RelayCommand]
     private async Task SaveAsync()
     {
+        // Clear all errors
+        NameError = null;
+        KeyError = null;
+
+        // Validate fields
+        if (string.IsNullOrWhiteSpace(Name))
+        {
+            NameError = "Name is required";
+        }
+
+        if (string.IsNullOrWhiteSpace(Key))
+        {
+            KeyError = "Key is required";
+        }
+
+        // If validation failed, return early
+        if (NameError != null || KeyError != null)
+        {
+            return;
+        }
+
         var project = new Project
         {
             Id = Id,
@@ -87,6 +123,11 @@ public partial class ProjectDetailViewModel : ViewModelBase
         {
             await _projectService.UpdateProjectAsync(project);
             IsEditMode = false;
+        }
+        else
+        {
+            // If service validation fails, show error on Name field
+            NameError = "Project validation failed";
         }
     }
 }

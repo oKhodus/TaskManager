@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using App.Application.Interfaces.Services;
 using App.Domain.Entities;
@@ -10,6 +9,10 @@ using TaskStatus = App.Domain.Enums.TaskStatus;
 
 namespace App.UI.ViewModels;
 
+/// <summary>
+/// ViewModel for task details
+/// Validation performed manually for better UX
+/// </summary>
 public partial class TaskDetailViewModel : ViewModelBase
 {
     private readonly ITaskService _taskService;
@@ -18,8 +21,6 @@ public partial class TaskDetailViewModel : ViewModelBase
     private Guid _id;
 
     [ObservableProperty]
-    [Required(ErrorMessage = "Title is required")]
-    [MinLength(3, ErrorMessage = "Title must be at least 3 characters")]
     private string _title = string.Empty;
 
     [ObservableProperty]

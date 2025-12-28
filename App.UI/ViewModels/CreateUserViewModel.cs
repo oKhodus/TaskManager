@@ -1,6 +1,5 @@
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using App.Application.Interfaces.Services;
 using App.Domain.Enums;
@@ -12,6 +11,7 @@ namespace App.UI.ViewModels;
 
 /// <summary>
 /// ViewModel for creating new users (admin only)
+/// Validation performed manually in CreateUserAsync for better UX
 /// </summary>
 public partial class CreateUserViewModel : ViewModelBase
 {
@@ -20,27 +20,18 @@ public partial class CreateUserViewModel : ViewModelBase
     private readonly ILogger<CreateUserViewModel> _logger;
 
     [ObservableProperty]
-    [Required(ErrorMessage = "Username is required")]
-    [MinLength(3, ErrorMessage = "Username must be at least 3 characters")]
-    [MaxLength(50, ErrorMessage = "Username cannot exceed 50 characters")]
     private string _username = string.Empty;
 
     [ObservableProperty]
-    [Required(ErrorMessage = "Password is required")]
-    [MinLength(6, ErrorMessage = "Password must be at least 6 characters")]
     private string _password = string.Empty;
 
     [ObservableProperty]
-    [Required(ErrorMessage = "Email is required")]
-    [EmailAddress(ErrorMessage = "Invalid email address")]
     private string _email = string.Empty;
 
     [ObservableProperty]
-    [Required(ErrorMessage = "First name is required")]
     private string _firstName = string.Empty;
 
     [ObservableProperty]
-    [Required(ErrorMessage = "Last name is required")]
     private string _lastName = string.Empty;
 
     [ObservableProperty]
@@ -50,13 +41,50 @@ public partial class CreateUserViewModel : ViewModelBase
     private bool _isActive = true;
 
     [ObservableProperty]
-    private string? _errorMessage;
+    private string? _usernameError;
+
+    [ObservableProperty]
+    private string? _passwordError;
+
+    [ObservableProperty]
+    private string? _emailError;
+
+    [ObservableProperty]
+    private string? _firstNameError;
+
+    [ObservableProperty]
+    private string? _lastNameError;
 
     [ObservableProperty]
     private string? _successMessage;
 
     [ObservableProperty]
     private bool _isLoading;
+
+    partial void OnUsernameChanged(string value)
+    {
+        UsernameError = null;
+    }
+
+    partial void OnPasswordChanged(string value)
+    {
+        PasswordError = null;
+    }
+
+    partial void OnEmailChanged(string value)
+    {
+        EmailError = null;
+    }
+
+    partial void OnFirstNameChanged(string value)
+    {
+        FirstNameError = null;
+    }
+
+    partial void OnLastNameChanged(string value)
+    {
+        LastNameError = null;
+    }
 
     public ObservableCollection<UserRole> AvailableRoles { get; } = new()
     {
@@ -81,7 +109,12 @@ public partial class CreateUserViewModel : ViewModelBase
     [RelayCommand]
     private async Task CreateUserAsync()
     {
-        ErrorMessage = null;
+        // Clear all errors
+        UsernameError = null;
+        PasswordError = null;
+        EmailError = null;
+        FirstNameError = null;
+        LastNameError = null;
         SuccessMessage = null;
         IsLoading = true;
 
@@ -90,7 +123,7 @@ public partial class CreateUserViewModel : ViewModelBase
             // Validate admin access
             if (!_currentUserService.IsAdmin)
             {
-                ErrorMessage = "Only administrators can create users";
+                UsernameError = "Only administrators can create users";
                 _logger.LogWarning("Non-admin user attempted to create user");
                 return;
             }
@@ -98,43 +131,43 @@ public partial class CreateUserViewModel : ViewModelBase
             // Validate inputs
             if (string.IsNullOrWhiteSpace(Username))
             {
-                ErrorMessage = "Username is required";
+                UsernameError = "Username is required";
                 _logger.LogWarning("User creation attempt with missing username");
-                return;
             }
 
             if (string.IsNullOrWhiteSpace(Password))
             {
-                ErrorMessage = "Password is required";
-                _logger.LogWarning("User creation attempt with missing password for username: {Username}", Username);
-                return;
+                PasswordError = "Password is required";
+                _logger.LogWarning("User creation attempt with missing password");
             }
-
-            if (Password.Length < 6)
+            else if (Password.Length < 6)
             {
-                ErrorMessage = "Password must be at least 6 characters";
+                PasswordError = "Password must be at least 6 characters";
                 _logger.LogWarning("User creation attempt with invalid password length for username: {Username}", Username);
-                return;
             }
 
             if (string.IsNullOrWhiteSpace(Email))
             {
-                ErrorMessage = "Email is required";
-                _logger.LogWarning("User creation attempt with missing email for username: {Username}", Username);
-                return;
+                EmailError = "Email is required";
+                _logger.LogWarning("User creation attempt with missing email");
             }
 
             if (string.IsNullOrWhiteSpace(FirstName))
             {
-                ErrorMessage = "First name is required";
-                _logger.LogWarning("User creation attempt with missing first name for username: {Username}", Username);
-                return;
+                FirstNameError = "First name is required";
+                _logger.LogWarning("User creation attempt with missing first name");
             }
 
             if (string.IsNullOrWhiteSpace(LastName))
             {
-                ErrorMessage = "Last name is required";
-                _logger.LogWarning("User creation attempt with missing last name for username: {Username}", Username);
+                LastNameError = "Last name is required";
+                _logger.LogWarning("User creation attempt with missing last name");
+            }
+
+            // If validation failed, return early
+            if (UsernameError != null || PasswordError != null || EmailError != null ||
+                FirstNameError != null || LastNameError != null)
+            {
                 return;
             }
 
@@ -173,12 +206,12 @@ public partial class CreateUserViewModel : ViewModelBase
         }
         catch (InvalidOperationException ex)
         {
-            ErrorMessage = ex.Message;
+            UsernameError = ex.Message;
             _logger.LogWarning(ex, "Invalid operation during user creation for username: {Username}", Username);
         }
         catch (Exception ex)
         {
-            ErrorMessage = $"Failed to create user: {ex.Message}";
+            UsernameError = $"Failed to create user: {ex.Message}";
             _logger.LogError(ex, "Failed to create user. Username: {Username}, Email: {Email}",
                 Username, Email);
         }
@@ -198,7 +231,11 @@ public partial class CreateUserViewModel : ViewModelBase
         LastName = string.Empty;
         SelectedRole = UserRole.Worker;
         IsActive = true;
-        ErrorMessage = null;
+        UsernameError = null;
+        PasswordError = null;
+        EmailError = null;
+        FirstNameError = null;
+        LastNameError = null;
         SuccessMessage = null;
         _logger.LogDebug("User creation form cleared");
     }
