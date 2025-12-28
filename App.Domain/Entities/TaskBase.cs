@@ -12,6 +12,12 @@ public abstract class TaskBase
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
     public DateTime? DueDate { get; set; }
+
+    /// <summary>
+    /// Type of the task (e.g., "Bug", "Feature").
+    /// Must be implemented by derived classes for UI display and extensibility.
+    /// </summary>
+    public abstract string TaskTypeName { get; }
     
     // Relationships
     public Guid ProjectId { get; set; }

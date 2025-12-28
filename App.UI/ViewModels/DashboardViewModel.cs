@@ -16,6 +16,9 @@ public partial class DashboardViewModel : ViewModelBase
     private KanbanBoardViewModel? _kanbanBoardViewModel;
 
     [ObservableProperty]
+    private TaskMasterViewModel? _taskMasterViewModel;
+
+    [ObservableProperty]
     private int _selectedTabIndex;
 
     public string CurrentUsername => _currentUserService.Username ?? "Guest";
@@ -27,11 +30,13 @@ public partial class DashboardViewModel : ViewModelBase
     public DashboardViewModel(
         ICurrentUserService currentUserService,
         ProjectMasterViewModel projectMasterViewModel,
-        KanbanBoardViewModel kanbanBoardViewModel)
+        KanbanBoardViewModel kanbanBoardViewModel,
+        TaskMasterViewModel taskMasterViewModel)
     {
         _currentUserService = currentUserService;
         _projectMasterViewModel = projectMasterViewModel;
         _kanbanBoardViewModel = kanbanBoardViewModel;
+        _taskMasterViewModel = taskMasterViewModel;
 
         // Admin sees Projects tab (index 0)
         // Worker sees Kanban tab (index 1, because Projects tab is hidden but still occupies index 0)

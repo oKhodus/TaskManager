@@ -2,6 +2,8 @@ namespace App.Domain.Entities;
 
 public class BugTask : TaskBase
 {
+    public override string TaskTypeName => "Bug";
+
     public string StepsToReproduce { get; set; } = string.Empty;
     public string? ExpectedBehavior { get; set; }
     public string? ActualBehavior { get; set; }

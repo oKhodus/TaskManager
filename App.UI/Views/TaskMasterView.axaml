@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:App.UI.ViewModels"
+             x:Class="App.UI.Views.TaskMasterView"
+             x:DataType="vm:TaskMasterViewModel"
+             Background="{StaticResource PrimaryBgBrush}">
+
+    <Grid RowDefinitions="Auto,*" Margin="10">
+        <!-- Header -->
+        <Border Grid.Row="0" Background="{StaticResource SecondaryBgBrush}"
+                CornerRadius="12" Padding="20" Margin="0,0,0,10">
+            <StackPanel Spacing="15">
+                <TextBlock Text="Task Manager" FontSize="18" FontWeight="Bold"
+                           Foreground="{StaticResource HeadingTextBrush}"/>
+
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <Button Content="Load All Tasks" Command="{Binding LoadTasksCommand}"/>
+                    <Button Content="Export to CSV" Command="{Binding ExportToCsvCommand}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Tasks List -->
+        <Border Grid.Row="1" Background="{StaticResource SecondaryBgBrush}"
+                CornerRadius="12" Padding="20">
+            <ScrollViewer>
+                <ItemsControl ItemsSource="{Binding Tasks}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{StaticResource CardBgBrush}"
+                                    CornerRadius="8"
+                                    Padding="15"
+                                    Margin="0,0,0,10"
+                                    BorderBrush="{StaticResource BorderDefaultBrush}"
+                                    BorderThickness="1">
+                                <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{Binding Title}"
+                                                   FontWeight="Bold"
+                                                   Foreground="{StaticResource InputTextBrush}"/>
+                                        <TextBlock Text="{Binding Description}"
+                                                   Foreground="{StaticResource LabelTextBrush}"
+                                                   FontSize="12"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   MaxWidth="400"/>
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding Status}"
+                                               Foreground="{StaticResource LabelTextBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="10,0"/>
+
+                                    <TextBlock Grid.Column="2"
+                                               Text="{Binding Priority}"
+                                               Foreground="{StaticResource LabelTextBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="10,0"/>
+
+                                    <TextBlock Grid.Column="3"
+                                               Text="{Binding TaskTypeName}"
+                                               Foreground="{StaticResource LabelTextBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="10,0"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

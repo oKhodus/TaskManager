@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -43,6 +44,9 @@ public partial class ProjectMasterViewModel : ViewModelBase
     [ObservableProperty]
     private string _projectToDeleteName = string.Empty;
 
+    [ObservableProperty]
+    private bool _isExportDropdownVisible;
+
     private Project? _projectPendingDeletion;
 
     /// <summary>
@@ -75,7 +79,10 @@ public partial class ProjectMasterViewModel : ViewModelBase
     private async void OnProjectSaved(object? sender, EventArgs e)
     {
         _logger.LogInformation("Project saved - refreshing project list");
-        await LoadProjectsAsync();
+
+        // Refresh data without UI side effects
+        var projects = await GetProjectsDataAsync();
+        Projects = new ObservableCollection<Project>(projects);
 
         // After loading, select the newly created project
         if (_projectDetailViewModel.Id != Guid.Empty)
@@ -97,8 +104,21 @@ public partial class ProjectMasterViewModel : ViewModelBase
         SelectedProject = null;
     }
 
+    /// <summary>
+    /// Fetches projects data without UI side effects.
+    /// Use for export, filters, or other non-display operations.
+    /// Follows SOLID Single Responsibility Principle.
+    /// </summary>
+    private async Task<IEnumerable<Project>> GetProjectsDataAsync()
+    {
+        _logger.LogDebug("Fetching projects data without UI effects");
+        var projects = await _projectService.GetActiveProjectsAsync();
+        _logger.LogDebug("Retrieved {ProjectCount} projects", projects.Count());
+        return projects;
+    }
+
     [RelayCommand]
-    private async Task LoadProjectsAsync()
+    private async Task LoadProjectsForDisplay()
     {
         // Toggle behavior: if list is already visible, hide it
         if (IsProjectsListVisible && Projects.Count > 0)
@@ -111,22 +131,22 @@ public partial class ProjectMasterViewModel : ViewModelBase
             return;
         }
 
-        _logger.LogInformation("Loading projects...");
+        _logger.LogInformation("Loading projects for display...");
         IsLoading = true;
         try
         {
-            var projects = await _projectService.GetActiveProjectsAsync();
+            var projects = await GetProjectsDataAsync();
             Projects = new ObservableCollection<Project>(projects);
-            _logger.LogInformation("Loaded {ProjectCount} projects", projects.Count());
+            _logger.LogInformation("Loaded {ProjectCount} projects for display", projects.Count());
 
-            // Show projects list and hide detail container
+            // Show projects list and hide detail container (UI side effects)
             IsProjectsListVisible = true;
             IsProjectDetailVisible = false;
             IsCreateMode = false;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to load projects");
+            _logger.LogError(ex, "Failed to load projects for display");
             throw;
         }
         finally
@@ -148,11 +168,28 @@ public partial class ProjectMasterViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task ExportToCsvAsync()
+    private void ToggleExportDropdown()
     {
+        IsExportDropdownVisible = !IsExportDropdownVisible;
+        _logger.LogDebug("Export dropdown toggled: Visible={Visible}", IsExportDropdownVisible);
+    }
+
+    [RelayCommand]
+    private async Task ExportProjects()
+    {
+        _logger.LogInformation("Export Projects command executed");
+
+        // Load data if collection is empty (no UI side effects)
         if (Projects.Count == 0)
         {
-            _logger.LogWarning("Export attempted with no projects available");
+            _logger.LogInformation("Projects not loaded, fetching data for export");
+            var projects = await GetProjectsDataAsync();
+            Projects = new ObservableCollection<Project>(projects);
+        }
+
+        if (Projects.Count == 0)
+        {
+            _logger.LogWarning("Export attempted with no projects available after data fetch");
             return;
         }
 
@@ -162,7 +199,22 @@ public partial class ProjectMasterViewModel : ViewModelBase
             var filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName);
 
             _logger.LogInformation("Exporting {ProjectCount} projects to {FilePath}", Projects.Count, filePath);
-            await _exportService.ExportToCsvAsync(Projects, filePath);
+
+            // Create export-friendly DTO with readable fields (no collections)
+            var exportData = Projects.Select(p => new
+            {
+                p.Id,
+                p.Name,
+                p.Key,
+                Description = p.Description ?? string.Empty,
+                IsActive = p.IsActive ? "Yes" : "No",
+                TasksCount = p.Tasks?.Count.ToString() ?? "0",
+                SprintsCount = p.Sprints?.Count.ToString() ?? "0",
+                CreatedAt = p.CreatedAt.ToString("yyyy-MM-dd HH:mm"),
+                UpdatedAt = p.UpdatedAt?.ToString("yyyy-MM-dd HH:mm") ?? "Never"
+            }).ToList();
+
+            await _exportService.ExportToCsvAsync(exportData, filePath);
             _logger.LogInformation("Export completed successfully");
 
             // Open folder with exported file for better UX
