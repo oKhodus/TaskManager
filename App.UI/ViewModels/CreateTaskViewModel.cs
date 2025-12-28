@@ -64,12 +64,25 @@ public partial class CreateTaskViewModel : ViewModelBase
     private bool _isLoading;
 
     [ObservableProperty]
-    private string? _errorMessage;
+    private string? _titleError;
+
+    [ObservableProperty]
+    private string? _projectError;
 
     [ObservableProperty]
     private string? _successMessage;
 
     public event EventHandler? TaskCreated;
+
+    partial void OnTitleChanged(string value)
+    {
+        TitleError = null;
+    }
+
+    partial void OnSelectedProjectChanged(Project? value)
+    {
+        ProjectError = null;
+    }
 
     public CreateTaskViewModel(
         ITaskRepository taskRepository,
@@ -109,7 +122,8 @@ public partial class CreateTaskViewModel : ViewModelBase
         try
         {
             IsLoading = true;
-            ErrorMessage = null;
+            TitleError = null;
+            ProjectError = null;
 
             _logger.LogDebug("Loading projects and users for task creation");
 
@@ -126,7 +140,7 @@ public partial class CreateTaskViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            ErrorMessage = $"Failed to load data: {ex.Message}";
+            TitleError = $"Failed to load data: {ex.Message}";
             _logger.LogError(ex, "Failed to load projects and users for task creation");
         }
         finally
@@ -150,35 +164,41 @@ public partial class CreateTaskViewModel : ViewModelBase
     {
         try
         {
-            ErrorMessage = null;
+            // Clear all errors
+            TitleError = null;
+            ProjectError = null;
             SuccessMessage = null;
 
             // Validation
             if (!_currentUserService.IsAdmin)
             {
-                ErrorMessage = "Only administrators can create tasks";
+                TitleError = "Only administrators can create tasks";
                 _logger.LogWarning("Non-admin user attempted to create task");
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(Title))
             {
-                ErrorMessage = "Title is required";
+                TitleError = "Title is required";
                 _logger.LogWarning("Task creation attempt with missing title");
-                return;
             }
 
             if (SelectedProject == null)
             {
-                ErrorMessage = "Please select a project";
+                ProjectError = "Please select a project";
                 _logger.LogWarning("Task creation attempt with no project selected");
-                return;
             }
 
             if (_currentUserService.CurrentUser == null)
             {
-                ErrorMessage = "User not authenticated";
+                TitleError = "User not authenticated";
                 _logger.LogWarning("Task creation attempt with no authenticated user");
+                return;
+            }
+
+            // If validation failed, return early
+            if (TitleError != null || ProjectError != null)
+            {
                 return;
             }
 
@@ -232,7 +252,7 @@ public partial class CreateTaskViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            ErrorMessage = $"Failed to create task: {ex.Message}";
+            TitleError = $"Failed to create task: {ex.Message}";
             _logger.LogError(ex, "Failed to create task. Title: {Title}, Project: {ProjectId}",
                 Title, SelectedProject?.Id);
         }
@@ -252,7 +272,8 @@ public partial class CreateTaskViewModel : ViewModelBase
         SelectedTaskType = "Feature";
         SelectedPriority = TaskPriority.Medium;
         SelectedStatus = Domain.Enums.TaskStatus.Todo;
-        ErrorMessage = null;
+        TitleError = null;
+        ProjectError = null;
         SuccessMessage = null;
         _logger.LogDebug("Task creation form cleared");
     }

@@ -117,14 +117,34 @@
                                        Foreground="{StaticResource HeadingTextBrush}" Margin="0,0,0,15"/>
 
                             <TextBlock Text="Name:" Foreground="{StaticResource LabelTextBrush}" Margin="0,0,0,5"/>
-                            <TextBox Text="{Binding Name}" IsReadOnly="{Binding !IsEditMode}" Margin="0,0,0,14"/>
+                            <TextBox Text="{Binding Name}"
+                                     Watermark="Enter project name..."
+                                     IsReadOnly="{Binding !IsEditMode}"
+                                     Margin="0,0,0,5"/>
+                            <TextBlock Text="{Binding NameError}"
+                               Foreground="#f87171"
+                               FontSize="12"
+                               Margin="0,0,0,9"
+                               IsVisible="{Binding NameError, Converter={x:Static ObjectConverters.IsNotNull}}"/>
 
                             <TextBlock Text="Key:" Foreground="{StaticResource LabelTextBrush}" Margin="0,0,0,5"/>
-                            <TextBox Text="{Binding Key}" IsReadOnly="{Binding !IsEditMode}" Margin="0,0,0,14"/>
+                            <TextBox Text="{Binding Key}"
+                                     Watermark="e.g., PROJ"
+                                     IsReadOnly="{Binding !IsEditMode}"
+                                     Margin="0,0,0,5"/>
+                            <TextBlock Text="{Binding KeyError}"
+                               Foreground="#f87171"
+                               FontSize="12"
+                               Margin="0,0,0,9"
+                               IsVisible="{Binding KeyError, Converter={x:Static ObjectConverters.IsNotNull}}"/>
 
                             <TextBlock Text="Description:" Foreground="{StaticResource LabelTextBrush}" Margin="0,0,0,5"/>
-                            <TextBox Text="{Binding Description}" IsReadOnly="{Binding !IsEditMode}"
-                                     AcceptsReturn="True" Height="100" Margin="0,0,0,14"/>
+                            <TextBox Text="{Binding Description}"
+                                     Watermark="Enter description (optional)..."
+                                     IsReadOnly="{Binding !IsEditMode}"
+                                     AcceptsReturn="True"
+                                     Height="100"
+                                     Margin="0,0,0,14"/>
 
                             <CheckBox Content="Active" IsChecked="{Binding IsActive}" IsEnabled="{Binding IsEditMode}" Margin="0,0,0,14"/>
 

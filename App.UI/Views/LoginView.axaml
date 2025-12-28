@@ -33,6 +33,10 @@
                     <TextBox Text="{Binding Username}"
                              Watermark="Enter your username"
                              IsEnabled="{Binding !IsLoading}"/>
+                    <TextBlock Text="{Binding UsernameError}"
+                               Foreground="#f87171"
+                               FontSize="12"
+                               IsVisible="{Binding UsernameError, Converter={x:Static ObjectConverters.IsNotNull}}"/>
                 </StackPanel>
 
                 <!-- Password -->
@@ -43,14 +47,11 @@
                              Watermark="Enter your password"
                              PasswordChar="●"
                              IsEnabled="{Binding !IsLoading}"/>
+                    <TextBlock Text="{Binding PasswordError}"
+                               Foreground="#f87171"
+                               FontSize="12"
+                               IsVisible="{Binding PasswordError, Converter={x:Static ObjectConverters.IsNotNull}}"/>
                 </StackPanel>
-
-                <!-- Error Message -->
-                <TextBlock Text="{Binding ErrorMessage}"
-                           Foreground="#f87171"
-                           FontSize="12"
-                           TextWrapping="Wrap"
-                           IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}"/>
 
                 <!-- Login Button -->
                 <Button Content="Sign In"

@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using App.Application.Interfaces.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -10,6 +9,7 @@ namespace App.UI.ViewModels;
 
 /// <summary>
 /// ViewModel for login screen
+/// Validation performed manually in LoginAsync for better UX
 /// </summary>
 public partial class LoginViewModel : ViewModelBase
 {
@@ -18,20 +18,33 @@ public partial class LoginViewModel : ViewModelBase
     private readonly ILogger<LoginViewModel> _logger;
 
     [ObservableProperty]
-    [Required(ErrorMessage = "Username is required")]
     private string _username = string.Empty;
 
     [ObservableProperty]
-    [Required(ErrorMessage = "Password is required")]
     private string _password = string.Empty;
 
     [ObservableProperty]
-    private string? _errorMessage;
+    private string? _usernameError;
+
+    [ObservableProperty]
+    private string? _passwordError;
 
     [ObservableProperty]
     private bool _isLoading;
 
     public event EventHandler? LoginSuccessful;
+
+    partial void OnUsernameChanged(string value)
+    {
+        // Clear error when user starts typing
+        UsernameError = null;
+    }
+
+    partial void OnPasswordChanged(string value)
+    {
+        // Clear error when user starts typing
+        PasswordError = null;
+    }
 
     public LoginViewModel(
         IAuthenticationService authenticationService,
@@ -48,15 +61,30 @@ public partial class LoginViewModel : ViewModelBase
     [RelayCommand]
     private async Task LoginAsync()
     {
-        ErrorMessage = null;
+        // Clear all errors
+        UsernameError = null;
+        PasswordError = null;
         IsLoading = true;
 
         try
         {
-            if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
+            // Validate username
+            if (string.IsNullOrWhiteSpace(Username))
             {
-                ErrorMessage = "Please enter both username and password";
-                _logger.LogWarning("Login attempt with missing credentials");
+                UsernameError = "Username is required";
+                _logger.LogWarning("Login attempt with missing username");
+            }
+
+            // Validate password
+            if (string.IsNullOrWhiteSpace(Password))
+            {
+                PasswordError = "Password is required";
+                _logger.LogWarning("Login attempt with missing password");
+            }
+
+            // If validation failed, return early
+            if (UsernameError != null || PasswordError != null)
+            {
                 return;
             }
 
@@ -66,7 +94,7 @@ public partial class LoginViewModel : ViewModelBase
 
             if (user == null)
             {
-                ErrorMessage = "Invalid username or password";
+                PasswordError = "Invalid username or password";
                 _logger.LogWarning("Failed login attempt for username: {Username} - Invalid credentials", Username);
                 return;
             }
@@ -81,7 +109,7 @@ public partial class LoginViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            ErrorMessage = $"Login failed: {ex.Message}";
+            PasswordError = $"Login failed: {ex.Message}";
             _logger.LogError(ex, "Login failed with exception for username: {Username}", Username);
         }
         finally

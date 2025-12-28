@@ -32,6 +32,10 @@
                     <TextBox Text="{Binding Username}"
                              Watermark="Enter username (min 3 characters)"
                              IsEnabled="{Binding !IsLoading}"/>
+                    <TextBlock Text="{Binding UsernameError}"
+                               Foreground="#f87171"
+                               FontSize="12"
+                               IsVisible="{Binding UsernameError, Converter={x:Static ObjectConverters.IsNotNull}}"/>
                 </StackPanel>
 
                 <!-- Password -->
@@ -43,6 +47,10 @@
                              Watermark="Enter password (min 6 characters)"
                              PasswordChar="●"
                              IsEnabled="{Binding !IsLoading}"/>
+                    <TextBlock Text="{Binding PasswordError}"
+                               Foreground="#f87171"
+                               FontSize="12"
+                               IsVisible="{Binding PasswordError, Converter={x:Static ObjectConverters.IsNotNull}}"/>
                 </StackPanel>
 
                 <!-- Email -->
@@ -53,6 +61,10 @@
                     <TextBox Text="{Binding Email}"
                              Watermark="user@example.com"
                              IsEnabled="{Binding !IsLoading}"/>
+                    <TextBlock Text="{Binding EmailError}"
+                               Foreground="#f87171"
+                               FontSize="12"
+                               IsVisible="{Binding EmailError, Converter={x:Static ObjectConverters.IsNotNull}}"/>
                 </StackPanel>
 
                 <!-- First Name -->
@@ -63,6 +75,10 @@
                     <TextBox Text="{Binding FirstName}"
                              Watermark="Enter first name"
                              IsEnabled="{Binding !IsLoading}"/>
+                    <TextBlock Text="{Binding FirstNameError}"
+                               Foreground="#f87171"
+                               FontSize="12"
+                               IsVisible="{Binding FirstNameError, Converter={x:Static ObjectConverters.IsNotNull}}"/>
                 </StackPanel>
 
                 <!-- Last Name -->
@@ -73,6 +89,10 @@
                     <TextBox Text="{Binding LastName}"
                              Watermark="Enter last name"
                              IsEnabled="{Binding !IsLoading}"/>
+                    <TextBlock Text="{Binding LastNameError}"
+                               Foreground="#f87171"
+                               FontSize="12"
+                               IsVisible="{Binding LastNameError, Converter={x:Static ObjectConverters.IsNotNull}}"/>
                 </StackPanel>
 
                 <!-- Role -->
@@ -91,19 +111,6 @@
                           IsChecked="{Binding IsActive}"
                           IsEnabled="{Binding !IsLoading}"
                           Foreground="{StaticResource LabelTextBrush}"/>
-
-                <!-- Error Message -->
-                <Border Background="#3f1515"
-                        BorderBrush="#f87171"
-                        BorderThickness="1"
-                        CornerRadius="6"
-                        Padding="12"
-                        IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
-                    <TextBlock Text="{Binding ErrorMessage}"
-                               Foreground="#f87171"
-                               TextWrapping="Wrap"
-                               FontSize="12"/>
-                </Border>
 
                 <!-- Success Message -->
                 <Border Background="#1a3f1a"

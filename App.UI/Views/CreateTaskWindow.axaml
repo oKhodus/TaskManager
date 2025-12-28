@@ -38,6 +38,10 @@
                     <TextBox Text="{Binding Title}"
                              Watermark="Enter task title"
                              IsEnabled="{Binding !IsLoading}"/>
+                    <TextBlock Text="{Binding TitleError}"
+                               Foreground="#f87171"
+                               FontSize="12"
+                               IsVisible="{Binding TitleError, Converter={x:Static ObjectConverters.IsNotNull}}"/>
                 </StackPanel>
 
                 <!-- Description -->
@@ -69,6 +73,10 @@
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
+                    <TextBlock Text="{Binding ProjectError}"
+                               Foreground="#f87171"
+                               FontSize="12"
+                               IsVisible="{Binding ProjectError, Converter={x:Static ObjectConverters.IsNotNull}}"/>
                 </StackPanel>
 
                 <!-- Assigned To -->
@@ -114,19 +122,6 @@
                               IsEnabled="{Binding !IsLoading}"
                               HorizontalAlignment="Stretch"/>
                 </StackPanel>
-
-                <!-- Error Message -->
-                <Border Background="#3f1515"
-                        BorderBrush="#f87171"
-                        BorderThickness="1"
-                        CornerRadius="6"
-                        Padding="12"
-                        IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
-                    <TextBlock Text="{Binding ErrorMessage}"
-                               Foreground="#f87171"
-                               TextWrapping="Wrap"
-                               FontSize="12"/>
-                </Border>
 
                 <!-- Success Message -->
                 <Border Background="#1a3f1a"
