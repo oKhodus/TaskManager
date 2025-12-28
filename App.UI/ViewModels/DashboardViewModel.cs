@@ -20,6 +20,7 @@ public partial class DashboardViewModel : ViewModelBase
 
     public string CurrentUsername => _currentUserService.Username ?? "Guest";
     public string CurrentUserRole => _currentUserService.Role?.ToString() ?? "Unknown";
+    public bool IsAdmin => _currentUserService.IsAdmin;
 
     public event EventHandler? LogoutRequested;
 
@@ -31,7 +32,10 @@ public partial class DashboardViewModel : ViewModelBase
         _currentUserService = currentUserService;
         _projectMasterViewModel = projectMasterViewModel;
         _kanbanBoardViewModel = kanbanBoardViewModel;
-        _selectedTabIndex = 0;
+
+        // Admin sees Projects tab (index 0)
+        // Worker sees Kanban tab (index 1, because Projects tab is hidden but still occupies index 0)
+        _selectedTabIndex = _currentUserService.IsAdmin ? 0 : 1;
     }
 
     [RelayCommand]

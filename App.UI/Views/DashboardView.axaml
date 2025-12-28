@@ -49,33 +49,65 @@
 
         <!-- Main Content -->
         <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedTabIndex}" Background="{StaticResource PrimaryBgBrush}">
-            <TabItem Header="Projects">
+            <TabItem Header="Projects" IsVisible="{Binding ProjectMasterViewModel.IsAdmin}">
                 <Grid RowDefinitions="Auto,*" ColumnDefinitions="2*,3*" Margin="10" Background="{StaticResource PrimaryBgBrush}">
-                <!-- Projects Master Sidebar -->
+                <!-- Admin Actions Sidebar -->
                 <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
                         Background="{StaticResource SecondaryBgBrush}"
                         CornerRadius="12"
                         Padding="20"
                         Margin="0,0,10,0">
-                    <Grid RowDefinitions="Auto,Auto,*">
-                        <TextBlock Grid.Row="0" Text="Projects" FontSize="18" FontWeight="Bold"
-                                   Foreground="{StaticResource HeadingTextBrush}" Margin="0,0,0,15"/>
+                    <Grid RowDefinitions="Auto,Auto,*" HorizontalAlignment="Center" MaxWidth="180">
+                        <TextBlock Grid.Row="0" Text="Actions" FontSize="18" FontWeight="Bold"
+                                   Foreground="{StaticResource HeadingTextBrush}" Margin="0,0,0,15"
+                                   HorizontalAlignment="Center"/>
 
                         <StackPanel Grid.Row="1" Spacing="8" Margin="0,0,0,15">
-                            <Button Content="Load Projects" Command="{Binding ProjectMasterViewModel.LoadProjectsCommand}"/>
-                            <Button Content="Export to CSV" Command="{Binding ProjectMasterViewModel.ExportToCsvCommand}"/>
+                            <!-- Admin Only Buttons - Ordered: Create Task, Create User, Create Project, Load Projects, Export, Delete -->
+                            <Button Content="Create Task"
+                                    Command="{Binding KanbanBoardViewModel.OpenCreateTaskDialogCommand}"
+                                    IsVisible="{Binding ProjectMasterViewModel.IsAdmin}"
+                                    Width="140"
+                                    HorizontalContentAlignment="Center"/>
 
-                            <!-- Admin Only: Create User Button -->
                             <Button Content="Create User"
                                     Command="{Binding ProjectMasterViewModel.OpenCreateUserDialogCommand}"
-                                    IsVisible="{Binding ProjectMasterViewModel.IsAdmin}"/>
+                                    IsVisible="{Binding ProjectMasterViewModel.IsAdmin}"
+                                    Width="140"
+                                    HorizontalContentAlignment="Center"/>
+
+                            <Button Content="Create Project"
+                                    Command="{Binding ProjectMasterViewModel.CreateNewProjectCommand}"
+                                    IsVisible="{Binding ProjectMasterViewModel.IsAdmin}"
+                                    Width="140"
+                                    HorizontalContentAlignment="Center"/>
+
+                            <Button Content="Load Projects"
+                                    Command="{Binding ProjectMasterViewModel.LoadProjectsCommand}"
+                                    Width="140"
+                                    HorizontalContentAlignment="Center"/>
+
+                            <Button Content="Export to CSV"
+                                    Command="{Binding ProjectMasterViewModel.ExportToCsvCommand}"
+                                    Width="140"
+                                    HorizontalContentAlignment="Center"/>
+
+                            <Button Content="Delete Project"
+                                    Command="{Binding ProjectMasterViewModel.DeleteProjectCommand}"
+                                    IsVisible="{Binding ProjectMasterViewModel.IsAdmin}"
+                                    IsEnabled="{Binding ProjectMasterViewModel.SelectedProject, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                    Width="140"
+                                    HorizontalContentAlignment="Center"
+                                    Background="#dc2626"
+                                    Foreground="White"/>
                         </StackPanel>
 
                         <ListBox Grid.Row="2"
                                  ItemsSource="{Binding ProjectMasterViewModel.Projects}"
                                  SelectedItem="{Binding ProjectMasterViewModel.SelectedProject}"
                                  Background="{StaticResource SecondaryBgBrush}"
-                                 BorderThickness="0">
+                                 BorderThickness="0"
+                                 IsVisible="{Binding ProjectMasterViewModel.IsProjectsListVisible}">
                             <ListBox.Styles>
                                 <Style Selector="ListBoxItem">
                                     <Setter Property="Background" Value="{StaticResource CardBgBrush}"/>
@@ -110,16 +142,28 @@
                         CornerRadius="12"
                         Padding="20"
                         BorderBrush="{StaticResource BorderDefaultBrush}"
-                        BorderThickness="1">
+                        BorderThickness="1"
+                        IsVisible="{Binding ProjectMasterViewModel.IsProjectDetailVisible}">
                     <ScrollViewer>
                         <StackPanel DataContext="{Binding ProjectMasterViewModel.ProjectDetailViewModel}">
-                            <TextBlock Text="Project Details" FontSize="18" FontWeight="Bold"
-                                       Foreground="{StaticResource HeadingTextBrush}" Margin="0,0,0,15"/>
+                            <!-- Title changes based on mode -->
+                            <TextBlock Text="Create New Project"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource HeadingTextBrush}"
+                                       Margin="0,0,0,15"
+                                       IsVisible="{Binding IsCreateMode}"/>
+                            <TextBlock Text="Project Details"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource HeadingTextBrush}"
+                                       Margin="0,0,0,15"
+                                       IsVisible="{Binding !IsCreateMode}"/>
 
                             <TextBlock Text="Name:" Foreground="{StaticResource LabelTextBrush}" Margin="0,0,0,5"/>
                             <TextBox Text="{Binding Name}"
                                      Watermark="Enter project name..."
-                                     IsReadOnly="{Binding !IsEditMode}"
+                                     IsReadOnly="{Binding !IsEditMode, FallbackValue=False}"
                                      Margin="0,0,0,5"/>
                             <TextBlock Text="{Binding NameError}"
                                Foreground="#f87171"
@@ -130,7 +174,7 @@
                             <TextBlock Text="Key:" Foreground="{StaticResource LabelTextBrush}" Margin="0,0,0,5"/>
                             <TextBox Text="{Binding Key}"
                                      Watermark="e.g., PROJ"
-                                     IsReadOnly="{Binding !IsEditMode}"
+                                     IsReadOnly="{Binding !IsEditMode, FallbackValue=False}"
                                      Margin="0,0,0,5"/>
                             <TextBlock Text="{Binding KeyError}"
                                Foreground="#f87171"
@@ -141,20 +185,89 @@
                             <TextBlock Text="Description:" Foreground="{StaticResource LabelTextBrush}" Margin="0,0,0,5"/>
                             <TextBox Text="{Binding Description}"
                                      Watermark="Enter description (optional)..."
-                                     IsReadOnly="{Binding !IsEditMode}"
+                                     IsReadOnly="{Binding !IsEditMode, FallbackValue=False}"
                                      AcceptsReturn="True"
                                      Height="100"
                                      Margin="0,0,0,14"/>
 
-                            <CheckBox Content="Active" IsChecked="{Binding IsActive}" IsEnabled="{Binding IsEditMode}" Margin="0,0,0,14"/>
+                            <CheckBox Content="Active"
+                                      IsChecked="{Binding IsActive}"
+                                      IsEnabled="{Binding IsEditMode}"
+                                      IsVisible="{Binding !IsCreateMode}"
+                                      Margin="0,0,0,14"/>
 
-                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,15,0,0">
-                                <Button Content="Edit" Command="{Binding StartEditCommand}" IsVisible="{Binding !IsEditMode}"/>
-                                <Button Content="Save" Command="{Binding SaveCommand}" IsVisible="{Binding IsEditMode}"/>
-                                <Button Content="Cancel" Command="{Binding CancelEditCommand}" IsVisible="{Binding IsEditMode}" Classes="secondary"/>
+                            <!-- Buttons for Edit Mode -->
+                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,15,0,0" IsVisible="{Binding !IsCreateMode}">
+                                <Button Content="Edit" Command="{Binding StartEditCommand}" IsVisible="{Binding !IsEditMode}" MinWidth="80" HorizontalContentAlignment="Center"/>
+                                <Button Content="Save" Command="{Binding SaveCommand}" IsVisible="{Binding IsEditMode}" MinWidth="80" HorizontalContentAlignment="Center"/>
+                                <Button Content="Cancel" Command="{Binding CancelEditCommand}" IsVisible="{Binding IsEditMode}" Classes="secondary" MinWidth="80" HorizontalContentAlignment="Center"/>
+                            </StackPanel>
+
+                            <!-- Buttons for Create Mode -->
+                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,15,0,0" IsVisible="{Binding IsCreateMode}">
+                                <Button Content="Create" Command="{Binding SaveCommand}" MinWidth="80" HorizontalContentAlignment="Center"/>
+                                <Button Content="Cancel" Command="{Binding CancelEditCommand}" Classes="secondary" MinWidth="80" HorizontalContentAlignment="Center"/>
                             </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
+                </Border>
+
+                <!-- Delete Confirmation Dialog Overlay -->
+                <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="2"
+                        Background="#80000000"
+                        IsVisible="{Binding ProjectMasterViewModel.IsDeleteConfirmationVisible}">
+                    <Border Background="{StaticResource SecondaryBgBrush}"
+                            CornerRadius="12"
+                            Padding="30"
+                            Width="400"
+                            BorderBrush="{StaticResource BorderDefaultBrush}"
+                            BorderThickness="1"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                        <StackPanel Spacing="20">
+                            <TextBlock Text="Confirm Deletion"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource HeadingTextBrush}"
+                                       HorizontalAlignment="Center"/>
+
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Are you sure you want to delete this project?"
+                                           Foreground="{StaticResource InputTextBrush}"
+                                           TextWrapping="Wrap"
+                                           HorizontalAlignment="Center"/>
+
+                                <Border Background="{StaticResource CardBgBrush}"
+                                        CornerRadius="8"
+                                        Padding="12"
+                                        BorderBrush="{StaticResource BorderDefaultBrush}"
+                                        BorderThickness="1">
+                                    <TextBlock Text="{Binding ProjectMasterViewModel.ProjectToDeleteName}"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource HeadingTextBrush}"
+                                               HorizontalAlignment="Center"/>
+                                </Border>
+
+                                <TextBlock Text="This action cannot be undone."
+                                           Foreground="#f87171"
+                                           FontSize="12"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,5,0,0"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                                <Button Content="Yes"
+                                        Command="{Binding ProjectMasterViewModel.ConfirmDeleteCommand}"
+                                        Background="#dc2626"
+                                        Foreground="White"
+                                        Padding="20,8"/>
+                                <Button Content="Cancel"
+                                        Command="{Binding ProjectMasterViewModel.CancelDeleteCommand}"
+                                        Classes="secondary"
+                                        Padding="20,8"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
                 </Border>
             </Grid>
         </TabItem>

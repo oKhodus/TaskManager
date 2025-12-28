@@ -40,6 +40,9 @@ public partial class ProjectDetailViewModel : ViewModelBase
     private bool _isEditMode;
 
     [ObservableProperty]
+    private bool _isCreateMode;
+
+    [ObservableProperty]
     private string? _nameError;
 
     [ObservableProperty]
@@ -54,6 +57,8 @@ public partial class ProjectDetailViewModel : ViewModelBase
     {
         KeyError = null;
     }
+
+    public event EventHandler? ProjectSaved;
 
     public ProjectDetailViewModel(IProjectService projectService)
     {
@@ -70,6 +75,7 @@ public partial class ProjectDetailViewModel : ViewModelBase
         CreatedAt = project.CreatedAt;
         UpdatedAt = project.UpdatedAt;
         IsEditMode = false;
+        IsCreateMode = false;
     }
 
     [RelayCommand]
@@ -82,7 +88,16 @@ public partial class ProjectDetailViewModel : ViewModelBase
     private void CancelEdit()
     {
         IsEditMode = false;
+
+        // Raise event to hide container if in create mode
+        if (IsCreateMode)
+        {
+            IsCreateMode = false;
+            ProjectCancelled?.Invoke(this, EventArgs.Empty);
+        }
     }
+
+    public event EventHandler? ProjectCancelled;
 
     [RelayCommand]
     private async Task SaveAsync()
@@ -121,8 +136,26 @@ public partial class ProjectDetailViewModel : ViewModelBase
 
         if (await _projectService.ValidateProjectAsync(project))
         {
-            await _projectService.UpdateProjectAsync(project);
+            if (IsCreateMode)
+            {
+                // Create new project
+                var createdProject = await _projectService.CreateProjectAsync(project);
+
+                // Update Id with generated value
+                Id = createdProject.Id;
+                CreatedAt = createdProject.CreatedAt;
+
+                // Notify that project was created
+                ProjectSaved?.Invoke(this, EventArgs.Empty);
+            }
+            else
+            {
+                // Update existing project
+                await _projectService.UpdateProjectAsync(project);
+            }
+
             IsEditMode = false;
+            IsCreateMode = false;
         }
         else
         {
