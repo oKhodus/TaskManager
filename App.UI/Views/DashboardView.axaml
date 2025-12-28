@@ -63,7 +63,7 @@
                                    HorizontalAlignment="Center"/>
 
                         <StackPanel Grid.Row="1" Spacing="8" Margin="0,0,0,15">
-                            <!-- Admin Only Buttons - Ordered: Create Task, Create User, Create Project, Load Projects, Export, Delete -->
+                            <!-- Admin Only Buttons - Ordered: Create Task, Create Project, Create User, Load Projects, Export, Delete -->
                             <Button Content="Create Task"
                                     Command="{Binding KanbanBoardViewModel.OpenCreateTaskDialogCommand}"
                                     IsVisible="{Binding ProjectMasterViewModel.IsAdmin}"
@@ -71,15 +71,15 @@
                                     HorizontalAlignment="Center"
                                     HorizontalContentAlignment="Center"/>
 
-                            <Button Content="Create User"
-                                    Command="{Binding ProjectMasterViewModel.OpenCreateUserDialogCommand}"
+                            <Button Content="Create Project"
+                                    Command="{Binding ProjectMasterViewModel.CreateNewProjectCommand}"
                                     IsVisible="{Binding ProjectMasterViewModel.IsAdmin}"
                                     Width="140"
                                     HorizontalAlignment="Center"
                                     HorizontalContentAlignment="Center"/>
 
-                            <Button Content="Create Project"
-                                    Command="{Binding ProjectMasterViewModel.CreateNewProjectCommand}"
+                            <Button Content="Create User"
+                                    Command="{Binding ProjectMasterViewModel.OpenCreateUserDialogCommand}"
                                     IsVisible="{Binding ProjectMasterViewModel.IsAdmin}"
                                     Width="140"
                                     HorizontalAlignment="Center"
