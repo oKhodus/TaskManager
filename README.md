@@ -202,7 +202,7 @@ Current CSV exports contain internal GUIDs which are not user-friendly and pose 
 - **Audit Trail**: Log role and permission changes
 
 ### UI/UX Enhancements
-- Create User/Task forms in dynamic container (instead of modals)
+- Create User/Task forms in dynamic container in Admin Panel (instead of modals )
 - Improved inactive project visualization
 - Dark mode support
 - Responsive layout improvements
@@ -210,9 +210,13 @@ Current CSV exports contain internal GUIDs which are not user-friendly and pose 
 
 ## 🚀 Getting Started
 
-### Using Make (Recommended for macOS/Linux)
+### Using Make (Recommended)
 
 ```bash
+# Clone repository
+git clone https://github.com/oKhodus/TaskManager.git
+cd TaskManager
+
 # Show all available commands
 make help
 
