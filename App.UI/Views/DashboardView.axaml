@@ -49,7 +49,7 @@
 
         <!-- Main Content -->
         <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedTabIndex}" Background="{StaticResource PrimaryBgBrush}">
-            <TabItem Header="Projects" IsVisible="{Binding ProjectMasterViewModel.IsAdmin}">
+            <TabItem Header="Admin Panel" IsVisible="{Binding ProjectMasterViewModel.IsAdmin}">
                 <Grid RowDefinitions="Auto,*" ColumnDefinitions="2*,3*" Margin="10" Background="{StaticResource PrimaryBgBrush}">
                 <!-- Admin Actions Sidebar -->
                 <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
@@ -57,7 +57,7 @@
                         CornerRadius="12"
                         Padding="20"
                         Margin="0,0,10,0">
-                    <Grid RowDefinitions="Auto,Auto,*" HorizontalAlignment="Center" MaxWidth="180">
+                    <Grid RowDefinitions="Auto,Auto,*" HorizontalAlignment="Center" Width="288">
                         <TextBlock Grid.Row="0" Text="Actions" FontSize="18" FontWeight="Bold"
                                    Foreground="{StaticResource HeadingTextBrush}" Margin="0,0,0,15"
                                    HorizontalAlignment="Center"/>
@@ -68,35 +68,56 @@
                                     Command="{Binding KanbanBoardViewModel.OpenCreateTaskDialogCommand}"
                                     IsVisible="{Binding ProjectMasterViewModel.IsAdmin}"
                                     Width="140"
+                                    HorizontalAlignment="Center"
                                     HorizontalContentAlignment="Center"/>
 
                             <Button Content="Create User"
                                     Command="{Binding ProjectMasterViewModel.OpenCreateUserDialogCommand}"
                                     IsVisible="{Binding ProjectMasterViewModel.IsAdmin}"
                                     Width="140"
+                                    HorizontalAlignment="Center"
                                     HorizontalContentAlignment="Center"/>
 
                             <Button Content="Create Project"
                                     Command="{Binding ProjectMasterViewModel.CreateNewProjectCommand}"
                                     IsVisible="{Binding ProjectMasterViewModel.IsAdmin}"
                                     Width="140"
+                                    HorizontalAlignment="Center"
                                     HorizontalContentAlignment="Center"/>
 
                             <Button Content="Load Projects"
-                                    Command="{Binding ProjectMasterViewModel.LoadProjectsCommand}"
+                                    Command="{Binding ProjectMasterViewModel.LoadProjectsForDisplayCommand}"
                                     Width="140"
+                                    HorizontalAlignment="Center"
                                     HorizontalContentAlignment="Center"/>
 
                             <Button Content="Export to CSV"
-                                    Command="{Binding ProjectMasterViewModel.ExportToCsvCommand}"
+                                    Command="{Binding ProjectMasterViewModel.ToggleExportDropdownCommand}"
                                     Width="140"
+                                    HorizontalAlignment="Center"
                                     HorizontalContentAlignment="Center"/>
+
+                            <!-- Export Dropdown: two 140px buttons centered in 288px container -->
+                            <StackPanel IsVisible="{Binding ProjectMasterViewModel.IsExportDropdownVisible}"
+                                        Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        Spacing="8"
+                                        Margin="0,4,0,0">
+                                <Button Content="Projects"
+                                        Command="{Binding ProjectMasterViewModel.ExportProjectsCommand}"
+                                        Width="140"
+                                        HorizontalContentAlignment="Center"/>
+                                <Button Content="Tasks"
+                                        Width="140"
+                                        HorizontalContentAlignment="Center"/>
+                            </StackPanel>
 
                             <Button Content="Delete Project"
                                     Command="{Binding ProjectMasterViewModel.DeleteProjectCommand}"
                                     IsVisible="{Binding ProjectMasterViewModel.IsAdmin}"
                                     IsEnabled="{Binding ProjectMasterViewModel.SelectedProject, Converter={x:Static ObjectConverters.IsNotNull}}"
                                     Width="140"
+                                    HorizontalAlignment="Center"
                                     HorizontalContentAlignment="Center"
                                     Background="#dc2626"
                                     Foreground="White"/>
@@ -272,8 +293,12 @@
             </Grid>
         </TabItem>
 
-        <TabItem Header="Kanban">
+        <TabItem Header="Dashboard">
             <views:KanbanBoardView DataContext="{Binding KanbanBoardViewModel}"/>
+        </TabItem>
+
+        <TabItem Header="Task Manager">
+            <views:TaskMasterView DataContext="{Binding TaskMasterViewModel}"/>
         </TabItem>
     </TabControl>
     </Grid>

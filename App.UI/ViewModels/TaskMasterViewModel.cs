@@ -18,7 +18,6 @@ public partial class TaskMasterViewModel : ViewModelBase
 {
     private readonly ITaskService _taskService;
     private readonly IExportService _exportService;
-    private readonly TaskDetailViewModel _taskDetailViewModel;
     private readonly ILogger<TaskMasterViewModel> _logger;
 
     [ObservableProperty]
@@ -39,9 +38,9 @@ public partial class TaskMasterViewModel : ViewModelBase
     [ObservableProperty]
     private TaskPriority? _selectedPriority;
 
+    // Remove null - Avalonia ComboBox doesn't handle it well
     public ObservableCollection<TaskStatus?> AvailableStatuses { get; } = new()
     {
-        null,
         TaskStatus.Todo,
         TaskStatus.Assigned,
         TaskStatus.InProgress,
@@ -51,24 +50,19 @@ public partial class TaskMasterViewModel : ViewModelBase
 
     public ObservableCollection<TaskPriority?> AvailablePriorities { get; } = new()
     {
-        null,
         TaskPriority.Low,
         TaskPriority.Medium,
         TaskPriority.High,
         TaskPriority.Critical
     };
 
-    public TaskDetailViewModel TaskDetailViewModel => _taskDetailViewModel;
-
     public TaskMasterViewModel(
         ITaskService taskService,
         IExportService exportService,
-        TaskDetailViewModel taskDetailViewModel,
         ILogger<TaskMasterViewModel> logger)
     {
         _taskService = taskService;
         _exportService = exportService;
-        _taskDetailViewModel = taskDetailViewModel;
         _logger = logger;
 
         _logger.LogDebug("TaskMasterViewModel initialized");
@@ -150,7 +144,8 @@ public partial class TaskMasterViewModel : ViewModelBase
     {
         if (value != null)
         {
-            _taskDetailViewModel.LoadTask(value);
+            _logger.LogDebug("Task selected: Id={TaskId}, Title={Title}", value.Id, value.Title);
+            // Task details can be shown in a separate window/dialog if needed
         }
     }
 
@@ -188,7 +183,17 @@ public partial class TaskMasterViewModel : ViewModelBase
             var filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName);
 
             _logger.LogInformation("Exporting {TaskCount} tasks to {FilePath}", Tasks.Count, filePath);
-            await _exportService.ExportToCsvAsync(Tasks, filePath);
+
+            // Create export-friendly DTO with format: taskTitle, project, assignedTo, taskDescription
+            var exportData = Tasks.Select(t => new
+            {
+                TaskTitle = t.Title,
+                Project = t.Project?.Name ?? "No Project",
+                AssignedTo = t.AssignedTo?.Username ?? "Unassigned",
+                TaskDescription = t.Description ?? string.Empty
+            }).ToList();
+
+            await _exportService.ExportToCsvAsync(exportData, filePath);
             _logger.LogInformation("Export completed successfully");
 
             // TODO: Show success notification to user
