@@ -4,6 +4,8 @@ using App.Application.Interfaces.Services;
 using App.Domain.Entities;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace App.UI.ViewModels;
 
@@ -14,6 +16,7 @@ namespace App.UI.ViewModels;
 public partial class ProjectDetailViewModel : ViewModelBase
 {
     private readonly IProjectService _projectService;
+    private readonly ILogger<ProjectDetailViewModel> _logger;
 
     [ObservableProperty]
     private Guid _id;
@@ -60,9 +63,12 @@ public partial class ProjectDetailViewModel : ViewModelBase
 
     public event EventHandler? ProjectSaved;
 
-    public ProjectDetailViewModel(IProjectService projectService)
+    public ProjectDetailViewModel(
+        IProjectService projectService,
+        ILogger<ProjectDetailViewModel> logger)
     {
         _projectService = projectService;
+        _logger = logger;
     }
 
     public void LoadProject(Project project)
@@ -102,6 +108,8 @@ public partial class ProjectDetailViewModel : ViewModelBase
     [RelayCommand]
     private async Task SaveAsync()
     {
+        _logger.LogDebug("SaveAsync called for project: Name={Name}, Key={Key}, IsCreateMode={IsCreateMode}", Name, Key, IsCreateMode);
+
         // Clear all errors
         NameError = null;
         KeyError = null;
@@ -110,16 +118,29 @@ public partial class ProjectDetailViewModel : ViewModelBase
         if (string.IsNullOrWhiteSpace(Name))
         {
             NameError = "Name is required";
+            _logger.LogDebug("Validation failed: Name is empty");
         }
 
         if (string.IsNullOrWhiteSpace(Key))
         {
             KeyError = "Key is required";
+            _logger.LogDebug("Validation failed: Key is empty");
         }
 
         // If validation failed, return early
         if (NameError != null || KeyError != null)
         {
+            return;
+        }
+
+        // Check Key uniqueness (exclude current project ID in edit mode)
+        var excludeId = IsCreateMode ? null : (Guid?)Id;
+        var isKeyUnique = await _projectService.IsKeyUniqueAsync(Key, excludeId);
+
+        if (!isKeyUnique)
+        {
+            KeyError = "A project with this key already exists";
+            _logger.LogInformation("Key uniqueness validation failed: Key={Key} already exists", Key);
             return;
         }
 
@@ -136,31 +157,67 @@ public partial class ProjectDetailViewModel : ViewModelBase
 
         if (await _projectService.ValidateProjectAsync(project))
         {
-            if (IsCreateMode)
+            try
             {
-                // Create new project
-                var createdProject = await _projectService.CreateProjectAsync(project);
+                if (IsCreateMode)
+                {
+                    _logger.LogInformation("Creating new project: Name={Name}, Key={Key}", Name, Key);
 
-                // Update Id with generated value
-                Id = createdProject.Id;
-                CreatedAt = createdProject.CreatedAt;
+                    // Create new project
+                    var createdProject = await _projectService.CreateProjectAsync(project);
 
-                // Notify that project was created
-                ProjectSaved?.Invoke(this, EventArgs.Empty);
+                    // Update Id with generated value
+                    Id = createdProject.Id;
+                    CreatedAt = createdProject.CreatedAt;
+
+                    _logger.LogInformation("Project created successfully: Id={ProjectId}", Id);
+
+                    // Notify that project was created
+                    ProjectSaved?.Invoke(this, EventArgs.Empty);
+                }
+                else
+                {
+                    _logger.LogInformation("Updating project: Id={ProjectId}, Name={Name}, Key={Key}", Id, Name, Key);
+
+                    // Update existing project
+                    await _projectService.UpdateProjectAsync(project);
+
+                    _logger.LogInformation("Project updated successfully: Id={ProjectId}", Id);
+                }
+
+                IsEditMode = false;
+                IsCreateMode = false;
             }
-            else
+            catch (DbUpdateException ex)
             {
-                // Update existing project
-                await _projectService.UpdateProjectAsync(project);
-            }
+                // Handle database constraint violations (e.g., UNIQUE constraint on Key)
+                _logger.LogError(ex, "Database error while saving project: Name={Name}, Key={Key}", Name, Key);
 
-            IsEditMode = false;
-            IsCreateMode = false;
+                // Check if this is a UNIQUE constraint violation on Key
+                if (ex.InnerException?.Message?.Contains("UNIQUE constraint failed: Projects.Key") == true)
+                {
+                    KeyError = "A project with this key already exists";
+                    _logger.LogWarning("UNIQUE constraint violation detected for Key={Key}", Key);
+                }
+                else
+                {
+                    // Generic error for other database issues
+                    NameError = "An error occurred while saving the project";
+                    _logger.LogError("Unexpected database error: {Message}", ex.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle any other unexpected errors
+                _logger.LogError(ex, "Unexpected error while saving project: Name={Name}, Key={Key}", Name, Key);
+                NameError = "An unexpected error occurred";
+            }
         }
         else
         {
             // If service validation fails, show error on Name field
             NameError = "Project validation failed";
+            _logger.LogWarning("Project validation failed: Name={Name}, Key={Key}", Name, Key);
         }
     }
 }

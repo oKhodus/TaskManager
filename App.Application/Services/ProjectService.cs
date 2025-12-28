@@ -65,11 +65,18 @@ public class ProjectService : IProjectService
         var project = await _projectRepository.GetByIdAsync(id, cancellationToken);
         if (project != null)
         {
-            // Business logic: Soft delete
+            var originalKey = project.Key;
+
+            // Business logic: Soft delete + release Key for reuse
             project.IsActive = false;
             project.UpdatedAt = DateTime.UtcNow;
+
+            // Append timestamp to Key to free it for new projects (avoids UNIQUE constraint issues)
+            project.Key = $"{project.Key}_deleted_{DateTime.UtcNow:yyyyMMddHHmmss}";
+
             await _projectRepository.UpdateAsync(project, cancellationToken);
-            _logger.LogInformation("Project soft-deleted successfully: Id={ProjectId}, Name={Name}", id, project.Name);
+            _logger.LogInformation("Project soft-deleted successfully: Id={ProjectId}, Name={Name}, OriginalKey={OriginalKey}, NewKey={NewKey}",
+                id, project.Name, originalKey, project.Key);
         }
         else
         {
@@ -85,5 +92,19 @@ public class ProjectService : IProjectService
                      project.Key.Length <= 10;
 
         return Task.FromResult(isValid);
+    }
+
+    public async Task<bool> IsKeyUniqueAsync(string key, Guid? excludeProjectId = null, CancellationToken cancellationToken = default)
+    {
+        _logger.LogDebug("Validating project key uniqueness: Key={ProjectKey}, ExcludeProjectId={ExcludeProjectId}", key, excludeProjectId);
+
+        var isUnique = await _projectRepository.IsKeyUniqueAsync(key, excludeProjectId, cancellationToken);
+
+        if (isUnique)
+            _logger.LogDebug("Project key {ProjectKey} validation passed - key is unique", key);
+        else
+            _logger.LogInformation("Project key {ProjectKey} validation failed - key already exists", key);
+
+        return isUnique;
     }
 }

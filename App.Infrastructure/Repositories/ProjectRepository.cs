@@ -75,4 +75,29 @@ public class ProjectRepository : RepositoryBase<Project>, IProjectRepository
 
         return project;
     }
+
+    public async Task<bool> IsKeyUniqueAsync(string key, Guid? excludeProjectId = null, CancellationToken cancellationToken = default)
+    {
+        _logger.LogDebug("Checking if project key {ProjectKey} is unique (excludeProjectId: {ExcludeProjectId})", key, excludeProjectId);
+
+        var existingProject = await _dbSet
+            .Where(p => p.Key == key)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (existingProject == null)
+        {
+            _logger.LogDebug("Project key {ProjectKey} is unique - no existing project found", key);
+            return true;
+        }
+
+        // If excludeProjectId is specified and matches the existing project, Key is still unique for this project
+        if (excludeProjectId.HasValue && existingProject.Id == excludeProjectId.Value)
+        {
+            _logger.LogDebug("Project key {ProjectKey} belongs to the current project (Id: {ProjectId}) - considered unique", key, excludeProjectId.Value);
+            return true;
+        }
+
+        _logger.LogDebug("Project key {ProjectKey} is NOT unique - already exists for project Id: {ExistingProjectId}", key, existingProject.Id);
+        return false;
+    }
 }

@@ -143,6 +143,7 @@ public partial class ProjectMasterViewModel : ViewModelBase
             IsProjectsListVisible = true;
             IsProjectDetailVisible = false;
             IsCreateMode = false;
+            SelectedProject = null; // Clear selection to allow re-clicking the same project
         }
         catch (Exception ex)
         {
@@ -163,6 +164,7 @@ public partial class ProjectMasterViewModel : ViewModelBase
             _projectDetailViewModel.LoadProject(value);
             _projectDetailViewModel.IsCreateMode = false;
             IsProjectDetailVisible = true;
+            IsProjectsListVisible = false; // Hide projects list when showing detail
             IsCreateMode = false;
         }
     }

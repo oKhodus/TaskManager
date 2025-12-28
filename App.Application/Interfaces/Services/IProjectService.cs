@@ -12,4 +12,5 @@ public interface IProjectService
     Task UpdateProjectAsync(Project project, CancellationToken cancellationToken = default);
     Task DeleteProjectAsync(Guid id, CancellationToken cancellationToken = default);
     Task<bool> ValidateProjectAsync(Project project);
+    Task<bool> IsKeyUniqueAsync(string key, Guid? excludeProjectId = null, CancellationToken cancellationToken = default);
 }
