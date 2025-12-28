@@ -122,39 +122,56 @@
                                     Background="#dc2626"
                                     Foreground="White"/>
                         </StackPanel>
-
-                        <ListBox Grid.Row="2"
-                                 ItemsSource="{Binding ProjectMasterViewModel.Projects}"
-                                 SelectedItem="{Binding ProjectMasterViewModel.SelectedProject}"
-                                 Background="{StaticResource SecondaryBgBrush}"
-                                 BorderThickness="0"
-                                 IsVisible="{Binding ProjectMasterViewModel.IsProjectsListVisible}">
-                            <ListBox.Styles>
-                                <Style Selector="ListBoxItem">
-                                    <Setter Property="Background" Value="{StaticResource CardBgBrush}"/>
-                                    <Setter Property="Margin" Value="0,0,0,8"/>
-                                    <Setter Property="Padding" Value="12"/>
-                                    <Setter Property="CornerRadius" Value="8"/>
-                                    <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}"/>
-                                    <Setter Property="BorderThickness" Value="1"/>
-                                </Style>
-                                <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-                                    <Setter Property="Background" Value="{StaticResource PrimaryButtonBgBrush}"/>
-                                </Style>
-                                <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-                                    <Setter Property="Background" Value="{StaticResource PrimaryButtonBgBrush}"/>
-                                </Style>
-                            </ListBox.Styles>
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="{StaticResource InputTextBrush}"/>
-                                        <TextBlock Text="{Binding Key}" FontSize="11" Foreground="{StaticResource LabelTextBrush}"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
                     </Grid>
+                </Border>
+
+                <!-- Projects List Panel (Right Container) -->
+                <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1"
+                        Background="{StaticResource CardBgBrush}"
+                        CornerRadius="12"
+                        Padding="20"
+                        BorderBrush="{StaticResource BorderDefaultBrush}"
+                        BorderThickness="1"
+                        IsVisible="{Binding ProjectMasterViewModel.IsProjectsListVisible}">
+                    <ScrollViewer>
+                        <StackPanel>
+                            <TextBlock Text="Projects"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource HeadingTextBrush}"
+                                       Margin="0,0,0,15"/>
+
+                            <ListBox ItemsSource="{Binding ProjectMasterViewModel.Projects}"
+                                     SelectedItem="{Binding ProjectMasterViewModel.SelectedProject}"
+                                     Background="{StaticResource CardBgBrush}"
+                                     BorderThickness="0">
+                                <ListBox.Styles>
+                                    <Style Selector="ListBoxItem">
+                                        <Setter Property="Background" Value="{StaticResource SecondaryBgBrush}"/>
+                                        <Setter Property="Margin" Value="0,0,0,8"/>
+                                        <Setter Property="Padding" Value="12"/>
+                                        <Setter Property="CornerRadius" Value="8"/>
+                                        <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}"/>
+                                        <Setter Property="BorderThickness" Value="1"/>
+                                    </Style>
+                                    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                                        <Setter Property="Background" Value="{StaticResource PrimaryButtonBgBrush}"/>
+                                    </Style>
+                                    <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                        <Setter Property="Background" Value="{StaticResource PrimaryButtonBgBrush}"/>
+                                    </Style>
+                                </ListBox.Styles>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="{StaticResource InputTextBrush}"/>
+                                            <TextBlock Text="{Binding Key}" FontSize="11" Foreground="{StaticResource LabelTextBrush}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </StackPanel>
+                    </ScrollViewer>
                 </Border>
 
                 <!-- Project Detail Panel -->
