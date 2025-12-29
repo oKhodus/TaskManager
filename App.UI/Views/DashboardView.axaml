@@ -133,7 +133,7 @@
                         BorderBrush="{StaticResource BorderDefaultBrush}"
                         BorderThickness="1"
                         IsVisible="{Binding ProjectMasterViewModel.IsProjectsListVisible}">
-                    <ScrollViewer>
+                    <ScrollViewer Margin="0,0,-15,0" Padding="0,0,20,0">
                         <StackPanel>
                             <TextBlock Text="Projects"
                                        FontSize="18"
@@ -182,7 +182,7 @@
                         BorderBrush="{StaticResource BorderDefaultBrush}"
                         BorderThickness="1"
                         IsVisible="{Binding ProjectMasterViewModel.IsProjectDetailVisible}">
-                    <ScrollViewer>
+                    <ScrollViewer Margin="0,0,-15,0" Padding="0,0,20,0">
                         <StackPanel DataContext="{Binding ProjectMasterViewModel.ProjectDetailViewModel}">
                             <!-- Title changes based on mode -->
                             <TextBlock Text="Create New Project"

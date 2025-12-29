@@ -23,7 +23,7 @@
         <!-- Tasks List -->
         <Border Grid.Row="1" Background="{StaticResource SecondaryBgBrush}"
                 CornerRadius="12" Padding="20">
-            <ScrollViewer>
+            <ScrollViewer Margin="0,0,-15,0" Padding="0,0,20,0">
                 <ItemsControl ItemsSource="{Binding Tasks}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
