@@ -63,8 +63,10 @@
         <ScrollViewer Grid.Row="1"
                       HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Disabled"
-                      Padding="10,0">
-            <ItemsControl ItemsSource="{Binding Columns}">
+                      Margin="10,0,10,0"
+                      Padding="0">
+            <ItemsControl ItemsSource="{Binding Columns}"
+                          Margin="0,0,0,30">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal" Spacing="15"/>
@@ -90,14 +92,18 @@
                                            FontSize="16"
                                            FontWeight="Bold"
                                            Foreground="{StaticResource HeadingTextBrush}"
+                                           HorizontalAlignment="Center"
                                            Margin="0,0,0,15"/>
 
                                 <!-- Cards List with Drag-Drop -->
                                 <ScrollViewer Grid.Row="1"
                                               VerticalScrollBarVisibility="Auto"
-                                              MaxHeight="600">
+                                              MaxHeight="600"
+                                              Margin="0,0,-10,0"
+                                              Padding="0,0,15,0">
                                     <ItemsControl ItemsSource="{Binding Cards}"
-                                                  x:Name="CardsItemsControl">
+                                                  x:Name="CardsItemsControl"
+                                                  Padding="0,0,0,15">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <!-- Task Card -->

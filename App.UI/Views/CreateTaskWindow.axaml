@@ -11,7 +11,7 @@
         Background="{StaticResource PrimaryBgBrush}">
 
     <Border Padding="30" Background="{StaticResource SecondaryBgBrush}" CornerRadius="12" Margin="10">
-        <ScrollViewer Padding="0,0,10,0">
+        <ScrollViewer Margin="0,0,-25,0" Padding="0,0,30,0">
             <StackPanel Spacing="18">
                 <!-- Header -->
                 <TextBlock Text="Create New Task"
