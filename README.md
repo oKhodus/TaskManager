@@ -214,7 +214,7 @@ Current CSV exports contain internal GUIDs which are not user-friendly and pose 
 
 ```bash
 # Clone repository
-git clone https://github.com/oKhodus/TaskManager.git
+git clone https://github.com/Vilis322/TaskManager.git
 cd TaskManager
 
 # Show all available commands
@@ -244,7 +244,7 @@ make migrations-add NAME=YourMigrationName
 
 ```bash
 # Clone repository
-git clone https://github.com/oKhodus/TaskManager.git
+git clone https://github.com/Vilis322/TaskManager.git
 cd TaskManager
 
 # Restore dependencies
@@ -266,7 +266,7 @@ dotnet run --project App.UI/App.UI.csproj
 
 ```powershell
 # Clone repository
-git clone https://github.com/oKhodus/TaskManager.git
+git clone https://github.com/Vilis322/TaskManager.git
 cd TaskManager
 
 # Restore dependencies
